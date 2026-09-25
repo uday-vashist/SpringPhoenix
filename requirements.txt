@@ -1,0 +1,18 @@
+# Python Helper Layer Requirements for SpringPhoenix
+# Purpose: Build/Test output parsing, JaCoCo coverage diffing, HTML/Markdown report generation, and CLI orchestration.
+
+# Report Templating
+jinja2>=3.1.2
+
+# XML & Data Parsing (JUnit Surefire XML, JaCoCo XML, YAML configs)
+defusedxml>=0.7.1
+pyyaml>=6.0.1
+
+# CLI Interface & Terminal Display
+click>=8.1.7
+rich>=13.7.0
+tabulate>=0.9.0
+
+# Development & Testing of Helper Layer
+pytest>=8.0.0
+pytest-cov>=4.1.0
