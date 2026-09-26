@@ -1,0 +1,26 @@
+{
+  "report_name": "SpringPhoenix Legacy Service",
+  "overall": {
+    "name": "SpringPhoenix Legacy Service",
+    "missed": 0,
+    "covered": 3,
+    "total": 3,
+    "percentage": 100.0
+  },
+  "packages": [
+    {
+      "name": "com.example.legacy",
+      "missed": 0,
+      "covered": 3,
+      "percentage": 100.0
+    }
+  ],
+  "classes": [
+    {
+      "name": "com.example.legacy.SpringPhoenixApplication",
+      "missed": 0,
+      "covered": 3,
+      "percentage": 100.0
+    }
+  ]
+}
