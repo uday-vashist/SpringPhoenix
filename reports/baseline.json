@@ -3,60 +3,60 @@
   "overall": {
     "name": "SpringPhoenix",
     "missed": 2,
-    "covered": 31,
-    "total": 33,
-    "percentage": 93.94
+    "covered": 44,
+    "total": 46,
+    "percentage": 95.65
   },
   "packages": [
     {
       "name": "com.example.legacy.controller",
       "missed": 0,
-      "covered": 10,
+      "covered": 14,
       "percentage": 100.0
     },
     {
       "name": "com.example.legacy.service",
       "missed": 0,
-      "covered": 8,
+      "covered": 12,
       "percentage": 100.0
     },
     {
       "name": "com.example.legacy",
-      "missed": 0,
-      "covered": 3,
-      "percentage": 100.0
+      "missed": 2,
+      "covered": 1,
+      "percentage": 33.33
     },
     {
       "name": "com.example.legacy.model",
-      "missed": 2,
-      "covered": 10,
-      "percentage": 83.33
+      "missed": 0,
+      "covered": 17,
+      "percentage": 100.0
     }
   ],
   "classes": [
     {
       "name": "com.example.legacy.controller.UserController",
       "missed": 0,
-      "covered": 10,
+      "covered": 14,
       "percentage": 100.0
     },
     {
       "name": "com.example.legacy.service.UserService",
       "missed": 0,
-      "covered": 8,
+      "covered": 12,
       "percentage": 100.0
     },
     {
       "name": "com.example.legacy.SpringPhoenixApplication",
-      "missed": 0,
-      "covered": 3,
-      "percentage": 100.0
+      "missed": 2,
+      "covered": 1,
+      "percentage": 33.33
     },
     {
       "name": "com.example.legacy.model.User",
-      "missed": 2,
-      "covered": 10,
-      "percentage": 83.33
+      "missed": 0,
+      "covered": 17,
+      "percentage": 100.0
     }
   ]
 }
