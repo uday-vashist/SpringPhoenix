@@ -19,8 +19,12 @@
 
     <properties>
         <java.version>17</java.version>
-        <jacoco.version>0.8.14</jacoco.version>
+        <jacoco.version>0.8.15</jacoco.version>
+        <pitest.version>1.15.3</pitest.version>
+        <pitest-junit5.version>1.2.1</pitest-junit5.version>
         <testcontainers.version>1.19.7</testcontainers.version>
+        <!-- Default empty so @{argLine} resolves even without jacoco:prepare-agent -->
+        <argLine></argLine>
     </properties>
 
     <dependencyManagement>
@@ -90,7 +94,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Maven Surefire Plugin configured for Java 25 / Mockito compatibility -->
+            <!-- Maven Surefire Plugin configured for Java 17 / Mockito compatibility -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -158,6 +162,35 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- PITest Mutation Testing Plugin -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <targetClasses>
+                        <param>com.example.legacy.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.example.legacy.*</param>
+                    </targetTests>
+                    <mutators>
+                        <mutator>DEFAULTS</mutator>
+                    </mutators>
+                    <outputFormats>
+                        <format>HTML</format>
+                        <format>XML</format>
+                    </outputFormats>
+                </configuration>
             </plugin>
         </plugins>
     </build>
