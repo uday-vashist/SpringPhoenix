@@ -1,24 +1,24 @@
 # SpringPhoenix — Before/After Impact Report
 
 **Module:** `com.example.legacy (UserController · UserService · UserRepository · User)`  
-**Generated:** 2026-09-26 19:52 UTC  
+**Generated:** 2026-09-27 05:44 UTC  
 **Pipeline:** SpringPhoenix Modernization Pipeline (IBM Bob 2.0 + JaCoCo + PITest)
 
 ---
 
 ## Summary Table
 
-| Metric | Before | After |
-|--------|--------|-------|
-| **Line Coverage %** | 95.65% (44/46 lines) | 95.65% (44/46 lines) |
-| **Branch Coverage %** | 0.0% (no tests) | 100.00% |
-| **Mutation Score %** | N/A (no tests existed) | 100.0% (26/26 killed, 0 survived) |
-| **Build Pass Rate** | Compiled, 0 tests | 68/68 (100%) (68 tests, 37.8s) |
-| **Self-Heal Cycles Used** | — | 0 cycles total |
-| **Business-Logic Gaps Flagged** | 0 | 3 gap(s) |
-| **Pipeline Runtime** | — | 59s (~1.0 min) |
-| **Manual Refactor Estimate** | ~8h (manual estimate) | — |
-| **Estimated Time Saved** | — | ≈ 479 min saved (8h manual → 1.0 min automated) |
+| Metric | Before Pipeline | After Baseline Generation | After Modernization |
+|--------|-----------------|--------------------------|---------------------|
+| **Line Coverage %** | 0.00% (0/46 lines) | 95.65% (44/46 lines) | 95.65% (44/46 lines) |
+| **Branch Coverage %** | 0.0% (no tests) | 0.0% (not captured) | 100.00% |
+| **Mutation Score %** | N/A (no tests existed) | N/A (baseline only) | 100.0% (26/26 killed, 0 survived) |
+| **Build Pass Rate** | Compiled, 0 tests | Baseline tests pass | 72/72 (100%) (72 tests, 13.1s) |
+| **Self-Heal Cycles Used** | — | — | 0 cycles total |
+| **Business-Logic Gaps Flagged** | 0 | 0 | 3 gap(s) |
+| **Pipeline Runtime** | — | — | 59s (~1.0 min) |
+| **Manual Refactor Estimate** | ~8h (manual estimate) | — | — |
+| **Estimated Time Saved** | — | — | ≈ 479 min saved (8h manual → 1.0 min automated) |
 
 ---
 
@@ -26,16 +26,16 @@
 
 | Test Class | Tests | Pass | Fail | Time (s) |
 |------------|-------|------|------|----------|
-| `UserControllerIntegrationTest` | 15 | 15 | 0 | 27.87 |
-| `UserControllerTest` | 7 | 7 | 0 | 0.83 |
-| `UserTest` | 8 | 8 | 0 | 0.10 |
-| `UserRepositoryIntegrationTest` | 13 | 13 | 0 | 4.85 |
-| `UserRepositoryTest` | 5 | 5 | 0 | 1.27 |
-| `UserServiceIntegrationTest` | 12 | 12 | 0 | 2.26 |
-| `UserServiceTest` | 6 | 6 | 0 | 0.57 |
-| `SpringPhoenixApplicationTests` | 2 | 2 | 0 | 0.09 |
+| `SpringPhoenixApplicationTests` | 2 | 2 | 0 | 0.70 |
+| `UserControllerIntegrationTest` | 15 | 15 | 0 | 2.63 |
+| `UserControllerTest` | 7 | 7 | 0 | 0.15 |
+| `UserTest` | 12 | 12 | 0 | 0.01 |
+| `UserRepositoryIntegrationTest` | 13 | 13 | 0 | 8.15 |
+| `UserRepositoryTest` | 5 | 5 | 0 | 0.80 |
+| `UserServiceIntegrationTest` | 12 | 12 | 0 | 0.40 |
+| `UserServiceTest` | 6 | 6 | 0 | 0.27 |
 
-**Total:** 68 tests · 68 passed · 0 failed · 37.8s
+**Total:** 72 tests · 72 passed · 0 failed · 13.1s
 
 ---
 

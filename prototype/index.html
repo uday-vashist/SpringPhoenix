@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpringPhoenix — Modernization Pipeline Prototype</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e5e7eb;
+    --text: #1f2328;
+    --muted: #57606a;
+    --accent: #3b82d4;
+    --green: #1a7f37;
+    --amber: #b45309;
+    --purple: #7c5cd8;
+    --red: #cf222e;
+    --dark: #1f2328;
+  }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  /* ── Layout ── */
+  .layout { display: block; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--dark);
+    color: #c9d1d9;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 2px 0 12px rgba(0,0,0,.25);
+    border-radius: 0 10px 10px 0;
+    user-select: none;
+  }
+  /* drag handle bar */
+  .sidebar-drag {
+    cursor: grab;
+    height: 28px;
+    background: #161b22;
+    border-radius: 0 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .sidebar-drag:active { cursor: grabbing; }
+  .sidebar-drag .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #484f58;
+  }
+  .sidebar-brand {
+    padding: 14px 20px 14px;
+    border-bottom: 1px solid #30363d;
+  }
+  .sidebar-brand .logo {
+    font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px;
+  }
+  .sidebar-brand .tagline {
+    font-size: 11px; color: #8b949e; margin-top: 2px;
+  }
+
+  .nav-section { padding: 12px 0; }
+  .nav-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .8px;
+    color: #8b949e; padding: 0 20px 6px; font-weight: 600;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px; cursor: pointer; transition: background .15s;
+    font-size: 13px; color: #c9d1d9; user-select: none;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: #30363d; }
+  .nav-item.active { background: #21262d; border-left-color: var(--accent); color: #fff; }
+  .nav-item .stage-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #484f58; flex-shrink: 0;
+  }
+  .nav-item.done   .stage-dot { background: var(--green); }
+  .nav-item.active .stage-dot { background: var(--accent); }
+  .nav-item.warn   .stage-dot { background: var(--amber); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid #30363d;
+    font-size: 11px; color: #8b949e;
+  }
+
+  /* ── Main ── */
+  .main {
+    padding: 28px 40px 48px 40px;
+    margin-left: 260px;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  /* ── Screen panels ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Page header ── */
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .page-header p  { font-size: 13px; color: var(--muted); }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 12px; margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-green  { background: #dcfce7; color: #15803d; }
+  .badge-amber  { background: #fef3c7; color: #92400e; }
+  .badge-purple { background: #ede9fe; color: #6d28d9; }
+  .badge-red    { background: #fee2e2; color: #991b1b; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px 22px; margin-bottom: 16px;
+  }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .card-row { display: grid; gap: 12px; margin-bottom: 16px; }
+  .card-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .card-row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .card-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  /* ── Stat tiles ── */
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; text-align: center;
+  }
+  .stat .s-label { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 4px; }
+  .stat .s-value { font-size: 26px; font-weight: 700; }
+  .stat .s-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .stat.green .s-value  { color: var(--green); }
+  .stat.blue  .s-value  { color: var(--accent); }
+  .stat.purple .s-value { color: var(--purple); }
+  .stat.amber .s-value  { color: var(--amber); }
+  .stat.red   .s-value  { color: var(--red); }
+
+  /* ── Progress bar ── */
+  .prog-wrap { background: #e5e7eb; border-radius: 6px; height: 10px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 6px; background: var(--green); transition: width .4s; }
+  .prog-fill.amber { background: var(--amber); }
+  .prog-fill.blue  { background: var(--accent); }
+  .prog-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--bg); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  tfoot td { background: var(--bg); font-weight: 700; border-top: 2px solid var(--border); border-bottom: none; }
+  td.pass  { color: var(--green); font-weight: 600; }
+  td.fail  { color: var(--red);   font-weight: 600; }
+  td.after { color: var(--green); font-weight: 600; }
+  td.before { color: var(--muted); }
+  td.baseline { color: var(--accent); font-weight: 600; }
+
+  /* ── Code block ── */
+  pre {
+    background: #0d1117; color: #c9d1d9;
+    border-radius: 6px; padding: 14px 16px;
+    font-size: 12px; font-family: "SFMono-Regular", Consolas, monospace;
+    line-height: 1.55; overflow-x: auto; margin-bottom: 12px;
+  }
+  code {
+    background: #f0f0f0; padding: 1px 5px; border-radius: 3px;
+    font-size: 11px; font-family: "SFMono-Regular", Consolas, monospace;
+  }
+
+  /* ── Step timeline ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 9px; top: 6px; bottom: 6px;
+    width: 2px; background: var(--border);
+  }
+  .tl-step { position: relative; margin-bottom: 18px; }
+  .tl-step::before {
+    content: ''; position: absolute; left: -22px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--border); border: 2px solid var(--surface);
+  }
+  .tl-step.done::before  { background: var(--green); }
+  .tl-step.active::before { background: var(--accent); }
+  .tl-step.warn::before  { background: var(--amber); }
+  .tl-step .tl-title { font-weight: 700; font-size: 13px; }
+  .tl-step .tl-body  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Gap card ── */
+  .gap-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid var(--amber); border-radius: 6px;
+    padding: 12px 16px; margin-bottom: 10px;
+  }
+  .gap-card .gt { font-weight: 700; font-size: 13px; }
+  .gap-card .gf { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
+  .gap-card .gr { font-size: 12px; }
+
+  /* ── Approval gate ── */
+  .gate-box {
+    border: 2px dashed var(--accent);
+    border-radius: 10px; padding: 22px 24px;
+    text-align: center; background: #eff6ff;
+    margin-bottom: 16px;
+  }
+  .gate-box h3 { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .gate-box p  { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+  .btn {
+    display: inline-block; padding: 8px 20px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; transition: opacity .15s; user-select: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: .88; }
+  .btn-green  { background: var(--green); color: #fff; }
+  .btn-green:hover { opacity: .88; }
+  .btn-ghost { background: var(--bg); border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── Heal pill ── */
+  .pill {
+    display: inline-block; border-radius: 12px; padding: 3px 12px;
+    font-size: 12px; font-weight: 600;
+  }
+  .pill-green  { background: #dcfce7; color: #15803d; }
+  .pill-amber  { background: #fef3c7; color: #92400e; }
+
+  /* ── Architecture flow ── */
+  .arch-flow {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 6px; margin: 20px 0 8px;
+  }
+  .arch-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; font-size: 12px;
+    text-align: center; min-width: 120px; flex: 1;
+  }
+  .arch-box .ab-label { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: .5px; margin-bottom: 6px; }
+  .arch-box .ab-name  { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .arch-box .ab-sub   { font-size: 11px; color: var(--muted); }
+  .arch-box.accent { border-color: var(--accent); background: #eff6ff; }
+  .arch-box.green  { border-color: var(--green);  background: #f0fdf4; }
+  .arch-box.purple { border-color: var(--purple); background: #f5f3ff; }
+  .arch-box.amber  { border-color: var(--amber);  background: #fffbeb; }
+  .arch-arrow {
+    font-size: 20px; color: var(--muted); padding: 0 2px; flex-shrink: 0; flex: 0;
+  }
+
+  /* ── Overview hero ── */
+  .hero {
+    background: var(--dark); color: #fff;
+    border-radius: 10px; padding: 28px 32px 24px;
+    margin-bottom: 24px;
+  }
+  .hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .hero .meta { font-size: 12px; color: #8b949e; line-height: 1.8; }
+  .hero .badge-hero {
+    display: inline-block; background: var(--accent); color: #fff;
+    font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 12px; margin-top: 10px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 680px) {
+    .sidebar { width: 220px; }
+    .main { padding: 20px 16px 40px; margin-left: 220px; }
+    .card-row.cols-3, .card-row.cols-4 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-drag" id="sidebarDrag">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+    <div class="sidebar-brand">
+      <div class="logo">🐦 SpringPhoenix</div>
+      <div class="tagline">IBM Bob 2.0 · Legacy Modernization</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" data-screen="overview">
+        <span class="stage-dot done"></span> Dashboard
+      </div>
+      <div class="nav-item" data-screen="architecture">
+        <span class="stage-dot done"></span> Architecture
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Pipeline Stages</div>
+      <div class="nav-item" data-screen="stage0">
+        <span class="stage-dot done"></span> Stage 0 — Baseline Capture
+      </div>
+      <div class="nav-item" data-screen="stage1">
+        <span class="stage-dot done"></span> Subagent 1 — Coverage Gate
+      </div>
+      <div class="nav-item" data-screen="approval">
+        <span class="stage-dot done"></span> Human Approval Gate
+      </div>
+      <div class="nav-item" data-screen="stage2">
+        <span class="stage-dot done"></span> Subagent 2 — Modernize
+      </div>
+      <div class="nav-item" data-screen="stage3">
+        <span class="stage-dot done"></span> Subagent 3 — Mutation Guard
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Output</div>
+      <div class="nav-item" data-screen="impact">
+        <span class="stage-dot done"></span> Impact Report
+      </div>
+      <div class="nav-item" data-screen="gaps">
+        <span class="stage-dot warn"></span> Knowledge Gaps (3)
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Built by Uday Vashist &amp; Ubee Kapoor<br>
+      IBM Bob 2.0 Hackathon · 2025
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main">
+
+    <!-- ─── OVERVIEW ─── -->
+    <div class="screen active" id="screen-overview">
+      <div class="hero">
+        <h1>SpringPhoenix — Modernization Pipeline</h1>
+        <div class="meta">
+          Module: <strong>com.example.legacy</strong> (UserController · UserService · UserRepository · User)<br>
+          Orchestrator: IBM Bob 2.0 · Code Tool: Qwen 2.5 Coder<br>
+          Pipeline completed in <strong>59 seconds</strong>
+        </div>
+        <span class="badge-hero">✓ All 72 tests passing — 0 surviving mutants</span>
+      </div>
+
+      <div class="card-row cols-3">
+        <div class="stat green">
+          <div class="s-label">Line Coverage</div>
+          <div class="s-value">95.7%</div>
+          <div class="s-sub">44 / 46 lines</div>
+        </div>
+        <div class="stat green">
+          <div class="s-label">Branch Coverage</div>
+          <div class="s-value">100%</div>
+          <div class="s-sub">Gate: ≥ 80%</div>
+        </div>
+        <div class="stat blue">
+          <div class="s-label">Mutation Score</div>
+          <div class="s-value">100%</div>
+          <div class="s-sub">26 / 26 killed</div>
+        </div>
+      </div>
+      <div class="card-row cols-3">
+        <div class="stat green">
+          <div class="s-label">Tests Passing</div>
+          <div class="s-value">72</div>
+          <div class="s-sub">0 failures</div>
+        </div>
+        <div class="stat purple">
+          <div class="s-label">Self-Heal Cycles</div>
+          <div class="s-value">0</div>
+          <div class="s-sub">Not triggered</div>
+        </div>
+        <div class="stat amber">
+          <div class="s-label">Logic Gaps Flagged</div>
+          <div class="s-value">3</div>
+          <div class="s-sub">Pending human review</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Pipeline Timeline</h3>
+        <div class="timeline">
+          <div class="tl-step done">
+            <div class="tl-title">Stage 0 — Pre-Flight Baseline <span class="badge badge-green">$0 token cost</span></div>
+            <div class="tl-body">Deterministic shell capture via <code>mvn test</code>. Bob ingests README, architecture docs, and specs via Document Understanding. Baseline JSON written to <code>reports/baseline.json</code>.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Subagent 1 — Baseline & Coverage Gate</div>
+            <div class="tl-body">Qwen 2.5 Coder generates JUnit 5 + Mockito tests. JaCoCo audits line &amp; branch coverage. Gate passed at 95.65% / 100% on first attempt.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Human Approval Gate <span class="badge badge-blue">Interactive</span></div>
+            <div class="tl-body">Bob CLI presented refactor plan and flagged business-logic items. Developer reviewed and approved.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Subagent 2 — Modernize & Verify</div>
+            <div class="tl-body">Java 8 → 21, Spring Boot 2 → 3, <code>javax.*</code> → <code>jakarta.*</code>. Testcontainers spun up real PostgreSQL. All 72 tests passed. Self-heal loops: 0.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Subagent 3 — Mutation Guardrail</div>
+            <div class="tl-body">PITest injected 26 bytecode mutants. All 26 killed on first pass. Zero assertion-strengthening cycles needed.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Output — Impact Report &amp; Knowledge Doc</div>
+            <div class="tl-body">Generated <code>reports/impact_report.html</code>, <code>reports/impact_report.md</code>, and <code>reports/knowledge_gaps.md</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Why SpringPhoenix Exists</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
+          Legacy Spring Boot services carry two kinds of debt: <strong>outdated code</strong> and <strong>undocumented knowledge</strong>.
+          Upgrading them manually is high-risk — nobody wants to touch code when nobody can guarantee nothing breaks,
+          and the reasoning behind half the implementation lives only in the head of a developer who might leave tomorrow.
+          SpringPhoenix uses IBM Bob 2.0 to pay off both debts at once: automated test generation locks in behavior
+          before any line is changed, parallel subagents isolate context to prevent hallucinations, and a living
+          knowledge document captures institutional logic along the way.
+        </p>
+      </div>
+    </div>
+
+    <!-- ─── ARCHITECTURE ─── -->
+    <div class="screen" id="screen-architecture">
+      <div class="page-header">
+        <h1>System Architecture</h1>
+        <p>IBM Bob 2.0 master orchestrator with 3 isolated subagents + deterministic tooling layer</p>
+      </div>
+
+      <div class="card">
+        <h3>High-Level Orchestration Flow</h3>
+        <div class="arch-flow">
+          <div class="arch-box accent">
+            <div class="ab-label">Trigger</div>
+            <div class="ab-name">Developer CLI</div>
+            <div class="ab-sub">mvn / bob run</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box accent">
+            <div class="ab-label">Orchestrator</div>
+            <div class="ab-name">IBM Bob 2.0</div>
+            <div class="ab-sub">Doc Understanding</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box green">
+            <div class="ab-label">Subagent 1</div>
+            <div class="ab-name">Baseline &amp; Gate</div>
+            <div class="ab-sub">Qwen + JaCoCo</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box amber">
+            <div class="ab-label">Gate</div>
+            <div class="ab-name">Human Approval</div>
+            <div class="ab-sub">Bob CLI</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box green">
+            <div class="ab-label">Subagent 2</div>
+            <div class="ab-name">Modernize</div>
+            <div class="ab-sub">Qwen + Containers</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box purple">
+            <div class="ab-label">Subagent 3</div>
+            <div class="ab-name">Mutation Guard</div>
+            <div class="ab-sub">PITest + Qwen</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box green">
+            <div class="ab-label">Output</div>
+            <div class="ab-name">Reports</div>
+            <div class="ab-sub">MD + HTML</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-row cols-2">
+        <div class="card" style="margin:0">
+          <h3>Bob-Native Layer</h3>
+          <div class="timeline">
+            <div class="tl-step done">
+              <div class="tl-title">Master Workflow Orchestrator</div>
+              <div class="tl-body">Coordinates stage transitions, scoped context packets, and subagent lifecycles.</div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-title">Document Understanding</div>
+              <div class="tl-body">Parses README, specs, and domain wikis into contextual embeddings for business-logic discovery.</div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-title">Human Approval Gate</div>
+              <div class="tl-body">Suspends execution before refactoring. Presents diff previews and risk matrices for explicit sign-off.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin:0">
+          <h3>Custom Tooling Layer</h3>
+          <div class="timeline">
+            <div class="tl-step done">
+              <div class="tl-title">JaCoCo Coverage Auditor</div>
+              <div class="tl-body">Deterministic line/branch coverage check. 80% gate. No LLM subjectivity.</div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-title">Testcontainers Engine</div>
+              <div class="tl-body">Docker-native PostgreSQL, MySQL, MariaDB instances for real SQL dialect regression testing.</div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-title">PITest Mutation Engine</div>
+              <div class="tl-body">Injects bytecode mutants (conditional inversions, return mutations). Measures assertion strength.</div>
+            </div>
+            <div class="tl-step done">
+              <div class="tl-title">Impact Report Generator</div>
+              <div class="tl-body">Python pipeline comparing baseline vs. modernized artifacts. Renders MD + HTML reports.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Why 3 Subagents Instead of One?</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;">
+          Running all 5 modernization phases inside a single AI context causes <strong>catastrophic context bloat</strong>.
+          Thousands of lines of JaCoCo coverage matrices, Surefire XML outputs, PITest bytecode mutant logs,
+          and terminal stack traces saturate token windows — causing hallucinations and degraded code quality.
+          SpringPhoenix isolates each phase into a dedicated Bob 2.0 subagent with a clean, sandboxed workspace
+          and focused tool access.
+        </p>
+        <table>
+          <thead><tr><th>Subagent</th><th>Context Budget</th><th>Tools Permitted</th><th>Exit Condition</th></tr></thead>
+          <tbody>
+            <tr><td><strong>SA-1 Baseline</strong></td><td>Legacy source + JaCoCo XML</td><td>Qwen, JaCoCo, Maven</td><td>≥ 80% line &amp; branch coverage</td></tr>
+            <tr><td><strong>SA-2 Modernize</strong></td><td>Approved source + error logs</td><td>Qwen, Docker, Maven</td><td>Clean <code>mvn test</code>, 0 failures</td></tr>
+            <tr><td><strong>SA-3 Mutation</strong></td><td>Modern source + PITest XML</td><td>PITest, Qwen, Maven</td><td>0 surviving mutants</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── STAGE 0 ─── -->
+    <div class="screen" id="screen-stage0">
+      <div class="page-header">
+        <h1>Stage 0 — Pre-Flight Baseline <span class="badge badge-green">$0 Token Cost</span></h1>
+        <p>Deterministic shell capture. No LLM cost. Establishes the ground truth before any AI touches the code.</p>
+      </div>
+
+      <div class="card">
+        <h3>What Runs Here</h3>
+        <div class="timeline">
+          <div class="tl-step done">
+            <div class="tl-title">Shell Baseline Capture</div>
+            <div class="tl-body"><code>mvn clean test</code> executed on the unmodified legacy codebase. Result (0 tests, 0% coverage) serialized to <code>reports/baseline.json</code>.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Bob Document Understanding</div>
+            <div class="tl-body">Bob ingests <code>README.md</code>, <code>docs/architecture.md</code>, <code>docs/prd.md</code>, and <code>.bob/SKILL.md</code> rules. Builds contextual embeddings for downstream subagents.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Target Version Confirmation</div>
+            <div class="tl-body">Bob reads <code>pom.xml</code> to confirm upgrade path: Java 8 → 21, Spring Boot 2.7 → 3.2. Locked before any subagent spawns.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Baseline Snapshot — <code>reports/baseline.json</code></h3>
+        <pre>{
+  "module":          "com.example.legacy",
+  "captured_at":     "2026-09-27T05:44:00Z",
+  "java_version":    "8",
+  "spring_boot":     "2.7.x",
+  "line_coverage":   0.0,
+  "branch_coverage": 0.0,
+  "lines_covered":   0,
+  "lines_total":     46,
+  "tests_count":     0,
+  "tests_passed":    0,
+  "build_status":    "compiled_no_tests"
+}</pre>
+      </div>
+
+      <div class="card">
+        <h3>Legacy Source — <code>UserService.java</code> (before modernization)</h3>
+        <pre>@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    // No @Transactional annotations — any method can corrupt state
+    // No updateUser() method — update requires delete + create
+
+    public List&lt;User&gt; getAllUsers() {
+        return userRepository.findAll();
+    }
+    public Optional&lt;User&gt; getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+    public void deleteUser(Long id) {
+        // No existence check — silent no-op on missing ID (flagged as gap)
+        userRepository.deleteById(id);
+    }
+}</pre>
+      </div>
+    </div>
+
+    <!-- ─── STAGE 1 ─── -->
+    <div class="screen" id="screen-stage1">
+      <div class="page-header">
+        <h1>Subagent 1 — Baseline &amp; Coverage Gate</h1>
+        <p>Qwen 2.5 Coder generates JUnit 5 tests. JaCoCo enforces the 80% line &amp; branch gate.</p>
+      </div>
+
+      <div class="card-row cols-2">
+        <div class="stat green">
+          <div class="s-label">Line Coverage</div>
+          <div class="s-value">95.65%</div>
+          <div class="s-sub">44 / 46 lines — Gate: ≥ 80% ✓</div>
+        </div>
+        <div class="stat green">
+          <div class="s-label">Branch Coverage</div>
+          <div class="s-value">100.0%</div>
+          <div class="s-sub">Gate passed on first attempt</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Coverage Gate — Line Coverage</h3>
+        <div class="prog-wrap"><div class="prog-fill" style="width:95.65%"></div></div>
+        <div class="prog-meta"><span>0%</span><span style="color:var(--green);font-weight:600">95.65%</span><span>Gate: 80%</span></div>
+        <p style="margin-top:10px;font-size:12px;color:var(--muted);">Gate threshold marker at 80%. Pipeline would have looped back to Qwen for additional tests if below threshold.</p>
+      </div>
+
+      <div class="card">
+        <h3>Generated Test Files</h3>
+        <table>
+          <thead><tr><th>File</th><th>Type</th><th>Tests Generated</th></tr></thead>
+          <tbody>
+            <tr><td><code>UserControllerTest</code></td><td>Unit (MockMvc)</td><td>7</td></tr>
+            <tr><td><code>UserControllerIntegrationTest</code></td><td>Integration (Testcontainers)</td><td>15</td></tr>
+            <tr><td><code>UserServiceTest</code></td><td>Unit (Mockito)</td><td>6</td></tr>
+            <tr><td><code>UserServiceIntegrationTest</code></td><td>Integration</td><td>12</td></tr>
+            <tr><td><code>UserRepositoryTest</code></td><td>Unit</td><td>5</td></tr>
+            <tr><td><code>UserRepositoryIntegrationTest</code></td><td>Integration (Testcontainers)</td><td>13</td></tr>
+            <tr><td><code>UserTest</code></td><td>Unit (Model)</td><td>12</td></tr>
+            <tr><td><code>SpringPhoenixApplicationTests</code></td><td>Application Context</td><td>2</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="2">Total tests locked in</td><td>72</td></tr></tfoot>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Sample Generated Test — <code>UserServiceTest.java</code></h3>
+        <pre>@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+
+    @Mock UserRepository userRepository;
+    @InjectMocks UserService userService;
+
+    @Test
+    void getAllUsers_returnsAllFromRepository() {
+        var users = List.of(new User(1L, "alice", "alice@example.com"));
+        when(userRepository.findAll()).thenReturn(users);
+
+        assertThat(userService.getAllUsers()).isEqualTo(users);
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    void deleteUser_callsDeleteById() {
+        userService.deleteUser(42L);
+        verify(userRepository).deleteById(42L);
+    }
+}</pre>
+      </div>
+    </div>
+
+    <!-- ─── APPROVAL GATE ─── -->
+    <div class="screen" id="screen-approval">
+      <div class="page-header">
+        <h1>Human Approval Gate <span class="badge badge-blue">Bob Interactive CLI</span></h1>
+        <p>Bob suspends execution and presents the refactor plan for explicit developer sign-off before any code changes.</p>
+      </div>
+
+      <div class="gate-box" id="gateBox">
+        <h3 id="gateTitle">🔒 Pipeline Paused — Awaiting Human Approval</h3>
+        <p id="gateDesc">Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.</p>
+        <span class="btn btn-green" id="btnApprove" style="margin-right:8px">✓ Approve &amp; Continue</span>
+        <span class="btn btn-ghost" id="btnReject">⤫ Reject &amp; Stop</span>
+      </div>
+
+      <div class="card">
+        <h3>Proposed Modernization Plan</h3>
+        <table>
+          <thead><tr><th>Change</th><th>Scope</th><th>Risk</th></tr></thead>
+          <tbody>
+            <tr><td>Java 8 → Java 21 (records, text blocks, switch expressions)</td><td>Build + source</td><td class="pass">Low</td></tr>
+            <tr><td>Spring Boot 2.7 → 3.2 (Jakarta namespace migration)</td><td><code>pom.xml</code> + imports</td><td class="pass">Low</td></tr>
+            <tr><td><code>javax.*</code> → <code>jakarta.*</code> in all imports</td><td>All source files</td><td class="pass">Low</td></tr>
+            <tr><td>Add <code>@Transactional(readOnly=true)</code> to read methods</td><td><code>UserService</code></td><td class="pass">Low</td></tr>
+            <tr><td>Add <code>updateUser(Long, User)</code> method</td><td><code>UserService</code> + <code>UserController</code></td><td class="pass">Low</td></tr>
+            <tr><td><code>POST /api/users</code> returns HTTP 201</td><td><code>UserController</code></td><td class="pass">Low</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Flagged Items for Review</h3>
+        <div class="gap-card">
+          <div class="gt">⚠ <code>UserService.deleteUser(Long id)</code></div>
+          <div class="gf"><code>src/main/java/com/example/legacy/service/UserService.java:63</code></div>
+          <div class="gr">Calls <code>deleteById</code> without first checking existence. Silent no-op on missing ID — behavior not documented. Flagged for human decision before modernization proceeds.</div>
+        </div>
+        <div class="gap-card">
+          <div class="gt">⚠ <code>User.equals()</code> / <code>User.hashCode()</code></div>
+          <div class="gf"><code>src/main/java/com/example/legacy/model/User.java</code></div>
+          <div class="gr">Surrogate-key equality means two transient (unpersisted) User instances with identical fields are not equal. <code>hashCode()</code> returns 0 for all transient objects. Documented JPA pattern but worth confirming intent.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STAGE 2 ─── -->
+    <div class="screen" id="screen-stage2">
+      <div class="page-header">
+        <h1>Subagent 2 — Modernize &amp; Verify</h1>
+        <p>Qwen 2.5 Coder upgrades the codebase. Testcontainers runs real Docker DB integration tests. Self-healing feedback loop on failures.</p>
+      </div>
+
+      <div class="card-row cols-3">
+        <div class="stat green">
+          <div class="s-label">Build Status</div>
+          <div class="s-value">72/72</div>
+          <div class="s-sub">Tests passing — 0 failures</div>
+        </div>
+        <div class="stat purple">
+          <div class="s-label">Self-Heal Cycles</div>
+          <div class="s-value">0</div>
+          <div class="s-sub">Max allowed: 3</div>
+        </div>
+        <div class="stat green">
+          <div class="s-label">Integration DB</div>
+          <div class="s-value">✓</div>
+          <div class="s-sub">PostgreSQL via Testcontainers</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Modernization Changes Applied</h3>
+        <div class="timeline">
+          <div class="tl-step done">
+            <div class="tl-title">pom.xml — Spring Boot 2.7 → 3.2 + Java 21</div>
+            <div class="tl-body">Parent POM version bumped, Java source/target set to 21, Hibernate 5 → 6 pulled transitively.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Namespace Migration: <code>javax.*</code> → <code>jakarta.*</code></div>
+            <div class="tl-body">All imports across UserController, User model, and repository updated. Verified with <code>mvn compile</code>.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title"><code>UserService</code> — @Transactional Hardening</div>
+            <div class="tl-body">Class-level <code>@Transactional(readOnly=true)</code> added. Write methods annotated with <code>@Transactional</code>. <code>updateUser()</code> method added.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title"><code>UserController</code> — POST returns 201, PUT endpoint added</div>
+            <div class="tl-body">createUser now returns <code>ResponseEntity.status(201).body(saved)</code>. New <code>PUT /{id}</code> delegates to <code>updateUser()</code>.</div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-title">Testcontainers Integration Tests Pass</div>
+            <div class="tl-body">Real PostgreSQL container started for <code>UserRepositoryIntegrationTest</code> and <code>UserControllerIntegrationTest</code>. No H2 in-memory fallback used.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Self-Heal Loop — Status</h3>
+        <span class="pill pill-green">✓ Not triggered — all 72 tests passed on initial run. 0 of 3 allowed cycles used.</span>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;">
+          If <code>mvn test</code> had failed, the self-heal loop would parse the terminal stack trace,
+          call Qwen with the error context, patch the failing file, and re-run tests —
+          up to 3 times per file before escalating to a human flag.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Modernized <code>UserService.java</code></h3>
+        <pre>@Service
+@Transactional(readOnly = true)   // ← added: disables dirty-check on reads
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public List&lt;User&gt; getAllUsers()             { return userRepository.findAll(); }
+    public Optional&lt;User&gt; getUserById(Long id) { return userRepository.findById(id); }
+
+    @Transactional
+    public User saveUser(User user)             { return userRepository.save(user); }
+
+    @Transactional                              // ← new method: was missing in legacy
+    public Optional&lt;User&gt; updateUser(Long id, User userDetails) {
+        return userRepository.findById(id).map(existing -&gt; {
+            existing.setUsername(userDetails.getUsername());
+            existing.setEmail(userDetails.getEmail());
+            return userRepository.save(existing);
+        });
+    }
+
+    @Transactional
+    public void deleteUser(Long id)             { userRepository.deleteById(id); }
+}</pre>
+      </div>
+    </div>
+
+    <!-- ─── STAGE 3 ─── -->
+    <div class="screen" id="screen-stage3">
+      <div class="page-header">
+        <h1>Subagent 3 — Mutation Guardrail</h1>
+        <p>PITest injects bytecode mutants. Qwen strengthens <code>assertThat()</code> checks for any survivors. Target: 0 surviving mutants.</p>
+      </div>
+
+      <div class="card-row cols-3">
+        <div class="stat blue">
+          <div class="s-label">Mutation Score</div>
+          <div class="s-value">100%</div>
+          <div class="s-sub">26 / 26 killed</div>
+        </div>
+        <div class="stat green">
+          <div class="s-label">Surviving Mutants</div>
+          <div class="s-value">0</div>
+          <div class="s-sub">Target achieved</div>
+        </div>
+        <div class="stat purple">
+          <div class="s-label">Strengthening Cycles</div>
+          <div class="s-value">0</div>
+          <div class="s-sub">Max allowed: 3</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Mutation Score Progress</h3>
+        <div class="prog-wrap"><div class="prog-fill blue" style="width:100%"></div></div>
+        <div class="prog-meta"><span>0%</span><span style="color:var(--accent);font-weight:600">100% — 26/26 killed</span><span>100%</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Mutation Categories Tested</h3>
+        <table>
+          <thead><tr><th>Mutation Type</th><th>Mutants Injected</th><th>Killed</th><th>Survived</th></tr></thead>
+          <tbody>
+            <tr><td>Conditional boundary inversion (<code>&lt;</code> → <code>&lt;=</code>)</td><td>8</td><td class="pass">8</td><td>0</td></tr>
+            <tr><td>Return value mutation (null / empty)</td><td>7</td><td class="pass">7</td><td>0</td></tr>
+            <tr><td>Void method call removal</td><td>6</td><td class="pass">6</td><td>0</td></tr>
+            <tr><td>Negated conditionals</td><td>5</td><td class="pass">5</td><td>0</td></tr>
+          </tbody>
+          <tfoot><tr><td>Total</td><td>26</td><td>26</td><td>0</td></tr></tfoot>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Sample Assertion — Mutation-Proof</h3>
+        <pre>@Test
+void deleteUser_callsDeleteById() {
+    userService.deleteUser(42L);
+    // assertThat strengthened to verify exact argument — catches void-removal mutants
+    verify(userRepository, times(1)).deleteById(42L);
+    verifyNoMoreInteractions(userRepository);
+}
+
+@Test
+void updateUser_returnsEmpty_whenNotFound() {
+    when(userRepository.findById(99L)).thenReturn(Optional.empty());
+    Optional&lt;User&gt; result = userService.updateUser(99L, new User());
+    // assertThat value assertion — catches return-value mutants
+    assertThat(result).isEmpty();
+    verify(userRepository).findById(99L);
+    verify(userRepository, never()).save(any());
+}</pre>
+      </div>
+    </div>
+
+    <!-- ─── IMPACT REPORT ─── -->
+    <div class="screen" id="screen-impact">
+      <div class="page-header">
+        <h1>Impact Report</h1>
+        <p>Before / After comparison across all three pipeline states</p>
+      </div>
+
+      <div class="card">
+        <h3>Before vs. After — Three-State Comparison</h3>
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Before Pipeline</th><th>After Baseline Generation</th><th>After Modernization</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Line Coverage</strong></td>
+              <td class="before">0.00% (0/46 lines)</td>
+              <td class="baseline">95.65% (44/46 lines)</td>
+              <td class="after">95.65% (44/46 lines)</td>
+            </tr>
+            <tr>
+              <td><strong>Branch Coverage</strong></td>
+              <td class="before">0.0% (no tests)</td>
+              <td class="baseline">0.0% (not captured)</td>
+              <td class="after">100.00%</td>
+            </tr>
+            <tr>
+              <td><strong>Mutation Score</strong></td>
+              <td class="before">N/A (no tests)</td>
+              <td class="baseline">N/A (baseline only)</td>
+              <td class="after">100% — 26/26 killed</td>
+            </tr>
+            <tr>
+              <td><strong>Tests Passing</strong></td>
+              <td class="before">0 tests existed</td>
+              <td class="baseline">72 baseline tests</td>
+              <td class="after">72/72 (100%) in 13.1s</td>
+            </tr>
+            <tr>
+              <td><strong>Self-Heal Cycles</strong></td>
+              <td class="before">—</td>
+              <td class="baseline">—</td>
+              <td class="after">0 / 3 — not triggered</td>
+            </tr>
+            <tr>
+              <td><strong>Business-Logic Gaps</strong></td>
+              <td class="before">0 (not scanned)</td>
+              <td class="baseline">0 (not scanned)</td>
+              <td class="after" style="color:var(--amber);font-weight:600">3 flagged — pending review</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-row cols-3" style="margin-top:0">
+        <div class="card" style="margin:0;text-align:center">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Pipeline Runtime</div>
+          <div style="font-size:28px;font-weight:700">59s</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Manual Estimate</div>
+          <div style="font-size:28px;font-weight:700">~8h</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center;border-color:var(--accent)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Net Time Saved</div>
+          <div style="font-size:28px;font-weight:700;color:var(--accent)">≈479 min</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Test Suite Breakdown</h3>
+        <table>
+          <thead><tr><th>Test Class</th><th>Type</th><th>Tests</th><th>Pass</th><th>Fail</th><th>Time (s)</th></tr></thead>
+          <tbody>
+            <tr><td><code>SpringPhoenixApplicationTests</code></td><td>Unit</td><td>2</td><td class="pass">2</td><td>0</td><td>0.70</td></tr>
+            <tr><td><code>UserControllerIntegrationTest</code></td><td>Integration</td><td>15</td><td class="pass">15</td><td>0</td><td>2.63</td></tr>
+            <tr><td><code>UserControllerTest</code></td><td>Unit</td><td>7</td><td class="pass">7</td><td>0</td><td>0.15</td></tr>
+            <tr><td><code>UserTest</code></td><td>Unit</td><td>12</td><td class="pass">12</td><td>0</td><td>0.01</td></tr>
+            <tr><td><code>UserRepositoryIntegrationTest</code></td><td>Integration</td><td>13</td><td class="pass">13</td><td>0</td><td>8.15</td></tr>
+            <tr><td><code>UserRepositoryTest</code></td><td>Unit</td><td>5</td><td class="pass">5</td><td>0</td><td>0.80</td></tr>
+            <tr><td><code>UserServiceIntegrationTest</code></td><td>Integration</td><td>12</td><td class="pass">12</td><td>0</td><td>0.40</td></tr>
+            <tr><td><code>UserServiceTest</code></td><td>Unit</td><td>6</td><td class="pass">6</td><td>0</td><td>0.27</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="2"><strong>Total</strong></td><td>72</td><td class="pass">72</td><td>0</td><td>13.1</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── KNOWLEDGE GAPS ─── -->
+    <div class="screen" id="screen-gaps">
+      <div class="page-header">
+        <h1>Business-Logic Gaps <span class="badge badge-amber">3 Flagged</span></h1>
+        <p>Undocumented behavior discovered during pipeline execution. Pending human review and documentation.</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--amber)">
+        <h3>How Gaps Are Detected</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
+          All three subagents run a parallel business-logic scanner alongside their primary task.
+          If a method's purpose isn't inferable from its name, comments, or surrounding context,
+          it is flagged — never silently documented with a guess.
+          Flagged items land in <code>reports/knowledge_gaps.md</code> with file path, method name,
+          why it's unclear, and a suggested reviewer question.
+        </p>
+      </div>
+
+      <div class="gap-card">
+        <div class="gt">1. <code>User.equals(Object o)</code></div>
+        <div class="gf"><code>src/main/java/com/example/legacy/model/User.java</code></div>
+        <div class="gr">
+          Uses surrogate-key-only equality: two entities with the same field values but <code>null</code> IDs
+          (transient, not yet persisted) are not considered equal. This is a documented JPA pattern
+          but creates surprising behavior in <code>Set</code>/<code>HashMap</code> use before first persist.
+          <strong>Reviewer question:</strong> Is the intent to never treat two unsaved Users as equal, or should
+          natural-key equality (username + email) apply to transient instances?
+        </div>
+      </div>
+
+      <div class="gap-card">
+        <div class="gt">2. <code>User.hashCode()</code></div>
+        <div class="gf"><code>src/main/java/com/example/legacy/model/User.java</code></div>
+        <div class="gr">
+          Returns <code>Objects.hashCode(id)</code>, which evaluates to <code>0</code> for all transient
+          (unsaved) <code>User</code> instances. All transient users collide into the same bucket in any
+          hash-based collection. This is a documented JPA constraint but can cause silent performance
+          degradation if Users are stored in Sets before persistence.
+          <strong>Reviewer question:</strong> Is the hash-bucket collision acceptable, or should transient
+          Users use a natural-key hash as a fallback?
+        </div>
+      </div>
+
+      <div class="gap-card">
+        <div class="gt">3. <code>UserService.deleteUser(Long id)</code></div>
+        <div class="gf"><code>src/main/java/com/example/legacy/service/UserService.java:63</code></div>
+        <div class="gr">
+          Calls <code>deleteById</code> without first checking whether the entity exists.
+          Spring Data's <code>deleteById</code> silently no-ops on a missing ID — it does not throw
+          an exception by default. The API caller receives HTTP 204 No Content regardless of whether
+          a record was actually deleted.
+          <strong>Reviewer question:</strong> Should <code>DELETE /api/users/{id}</code> return HTTP 404
+          when the user doesn't exist, or is 204-always the intentional contract?
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:var(--muted);margin-top:8px;">
+        Full details in <code>reports/knowledge_gaps.md</code>
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── Navigation ──
+  const navItems = document.querySelectorAll('.nav-item');
+  const screens  = document.querySelectorAll('.screen');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const target = item.dataset.screen;
+      navItems.forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      screens.forEach(s => {
+        s.classList.toggle('active', s.id === 'screen-' + target);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ── Approval Gate ──
+  function navigateTo(screenId) {
+    navItems.forEach(n => n.classList.remove('active'));
+    const target = document.querySelector(`.nav-item[data-screen="${screenId}"]`);
+    if (target) target.classList.add('active');
+    screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + screenId));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('btnApprove').addEventListener('click', () => {
+    const box   = document.getElementById('gateBox');
+    const title = document.getElementById('gateTitle');
+    const desc  = document.getElementById('gateDesc');
+    const btnA  = document.getElementById('btnApprove');
+    const btnR  = document.getElementById('btnReject');
+
+    // Flash approved state briefly, then navigate
+    box.style.background   = '#f0fdf4';
+    box.style.borderColor  = '#86efac';
+    title.textContent      = '✅ Approved — Launching Subagent 2';
+    desc.textContent       = 'Authorization confirmed. Spawning Subagent 2 for modernization…';
+    btnA.style.display     = 'none';
+    btnR.style.display     = 'none';
+
+    setTimeout(() => {
+      // Reset gate for next visit
+      box.style.background   = '';
+      box.style.borderColor  = '';
+      title.textContent      = '🔒 Pipeline Paused — Awaiting Human Approval';
+      desc.innerHTML         = 'Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.';
+      btnA.style.display     = '';
+      btnR.style.display     = '';
+      navigateTo('stage2');
+    }, 900);
+  });
+
+  document.getElementById('btnReject').addEventListener('click', () => {
+    const box   = document.getElementById('gateBox');
+    const title = document.getElementById('gateTitle');
+    const desc  = document.getElementById('gateDesc');
+    box.style.background  = '#fff1f2';
+    box.style.borderColor = '#fca5a5';
+    title.textContent     = '⛔ Pipeline Stopped';
+    desc.textContent      = 'Modernization rejected. No code changes have been made. Re-run the pipeline when ready.';
+    document.getElementById('btnApprove').style.display = 'none';
+    document.getElementById('btnReject').textContent    = '↩ Reset';
+    document.getElementById('btnReject').onclick = () => {
+      box.style.background  = '';
+      box.style.borderColor = '';
+      title.textContent     = '🔒 Pipeline Paused — Awaiting Human Approval';
+      desc.innerHTML        = 'Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.';
+      document.getElementById('btnApprove').style.display = '';
+      document.getElementById('btnReject').textContent    = '⤫ Reject & Stop';
+      document.getElementById('btnReject').onclick        = null;
+    };
+  });
+
+  // ── Draggable sidebar ──
+  const sidebar   = document.getElementById('sidebar');
+  const dragHandle = document.getElementById('sidebarDrag');
+  const main      = document.querySelector('.main');
+
+  let dragging = false;
+  let startX, startY, origLeft, origTop;
+
+  dragHandle.addEventListener('mousedown', e => {
+    dragging = true;
+    startX   = e.clientX;
+    startY   = e.clientY;
+    origLeft = sidebar.getBoundingClientRect().left;
+    origTop  = sidebar.getBoundingClientRect().top;
+    dragHandle.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const newLeft = Math.max(0, Math.min(window.innerWidth - sidebar.offsetWidth, origLeft + dx));
+    const newTop  = Math.max(0, Math.min(window.innerHeight - 60, origTop + dy));
+    sidebar.style.left   = newLeft + 'px';
+    sidebar.style.top    = newTop  + 'px';
+    // detach from normal flow — stop driving main margin once user moves it
+    main.style.marginLeft = '0';
+    sidebar.style.borderRadius = '10px';
+    sidebar.style.boxShadow = '0 8px 32px rgba(0,0,0,.35)';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    dragHandle.style.cursor = 'grab';
+  });
+
+  // Touch support
+  dragHandle.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    dragging = true;
+    startX   = t.clientX;
+    startY   = t.clientY;
+    origLeft = sidebar.getBoundingClientRect().left;
+    origTop  = sidebar.getBoundingClientRect().top;
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const t = e.touches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    const newLeft = Math.max(0, Math.min(window.innerWidth - sidebar.offsetWidth, origLeft + dx));
+    const newTop  = Math.max(0, Math.min(window.innerHeight - 60, origTop + dy));
+    sidebar.style.left   = newLeft + 'px';
+    sidebar.style.top    = newTop  + 'px';
+    main.style.marginLeft = '0';
+    sidebar.style.borderRadius = '10px';
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => { dragging = false; });
+</script>
+
+</body>
+</html>
