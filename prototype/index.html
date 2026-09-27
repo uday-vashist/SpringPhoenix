@@ -113,8 +113,9 @@
   }
 
   /* ── Screen panels ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
+  .screen { display: none; opacity: 0; }
+  .screen.active { display: block; animation: fadeIn .25s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   /* ── Page header ── */
   .page-header { margin-bottom: 24px; }
@@ -137,6 +138,7 @@
   .card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 20px 22px; margin-bottom: 16px;
+    transition: box-shadow .2s;
   }
   .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
   .card-row { display: grid; gap: 12px; margin-bottom: 16px; }
@@ -148,6 +150,12 @@
   .stat {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 14px 16px; text-align: center;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+  }
+  .stat[style*="cursor:pointer"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    border-color: #c8d0d8;
   }
   .stat .s-label { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 4px; }
   .stat .s-value { font-size: 26px; font-weight: 700; }
@@ -160,7 +168,7 @@
 
   /* ── Progress bar ── */
   .prog-wrap { background: #e5e7eb; border-radius: 6px; height: 10px; overflow: hidden; }
-  .prog-fill  { height: 100%; border-radius: 6px; background: var(--green); transition: width .4s; }
+  .prog-fill  { height: 100%; border-radius: 6px; background: var(--green); transition: width .6s ease; }
   .prog-fill.amber { background: var(--amber); }
   .prog-fill.blue  { background: var(--accent); }
   .prog-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
@@ -212,10 +220,25 @@
     background: var(--surface); border: 1px solid var(--border);
     border-left: 4px solid var(--amber); border-radius: 6px;
     padding: 12px 16px; margin-bottom: 10px;
+    transition: box-shadow .15s;
   }
   .gap-card .gt { font-weight: 700; font-size: 13px; }
   .gap-card .gf { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
   .gap-card .gr { font-size: 12px; }
+
+  /* collapsible gap cards */
+  .gap-collapsible { cursor: pointer; }
+  .gap-collapsible:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .gap-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .gap-chevron { font-size: 11px; color: var(--muted); flex-shrink: 0; margin-top: 3px; transition: transform .2s; }
+  .gap-collapsible.open .gap-chevron { transform: rotate(180deg); }
+  .gap-body { display: none; border-top: 1px solid var(--border); margin-top: 10px; padding-top: 4px; }
+  .gap-collapsible.open .gap-body { display: block; }
+  .gap-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+    background: #f0f0f0; color: var(--muted);
+  }
+  .gap-badge.warn { background: #fef3c7; color: #92400e; }
 
   /* ── Approval gate ── */
   .gate-box {
@@ -361,7 +384,13 @@
           Orchestrator: IBM Bob 2.0 · Code Tool: Qwen 2.5 Coder<br>
           Pipeline runtime: <strong>59 seconds</strong>
         </div>
-        <span class="badge-hero" id="heroBadge">✓ All 72 tests passing — 0 surviving mutants</span>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span class="badge-hero" id="heroBadge">✓ All 72 tests passing — 0 surviving mutants</span>
+          <button id="heroRunBtn"
+            style="background:#3b82d4;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.2px">
+            ▶ Run Pipeline
+          </button>
+        </div>
       </div>
 
       <!-- Animated stat cards -->
@@ -1013,47 +1042,145 @@ void updateUser_returnsEmpty_whenNotFound() {
         </p>
       </div>
 
-      <div class="gap-card">
-        <div class="gt">1. <code>User.equals(Object o)</code></div>
-        <div class="gf"><code>src/main/java/com/example/legacy/model/User.java</code></div>
-        <div class="gr">
-          Uses surrogate-key-only equality: two entities with the same field values but <code>null</code> IDs
-          (transient, not yet persisted) are not considered equal. This is a documented JPA pattern
-          but creates surprising behavior in <code>Set</code>/<code>HashMap</code> use before first persist.
-          <strong>Reviewer question:</strong> Is the intent to never treat two unsaved Users as equal, or should
-          natural-key equality (username + email) apply to transient instances?
+      <!-- Gap card 1 -->
+      <div class="gap-card gap-collapsible" id="gap1">
+        <div class="gap-header" onclick="toggleGap('gap1')">
+          <span class="gt">1. <code>User.equals(Object o)</code></span>
+          <div class="gf" style="margin:2px 0 0"><code>src/main/java/com/example/legacy/model/User.java</code></div>
+          <span class="gap-chevron">▼</span>
+        </div>
+        <div class="gap-body">
+          <div class="gr" style="margin-top:10px">
+            Uses surrogate-key-only equality: two entities with the same field values but <code>null</code> IDs
+            (transient, not yet persisted) are not considered equal. This is a documented JPA pattern
+            but creates surprising behavior in <code>Set</code>/<code>HashMap</code> use before first persist.<br><br>
+            <strong>Reviewer question:</strong> Is the intent to never treat two unsaved Users as equal, or should
+            natural-key equality (username + email) apply to transient instances?
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <span class="gap-badge">JPA Pattern</span>
+            <span class="gap-badge warn">Review Needed</span>
+          </div>
         </div>
       </div>
 
-      <div class="gap-card">
-        <div class="gt">2. <code>User.hashCode()</code></div>
-        <div class="gf"><code>src/main/java/com/example/legacy/model/User.java</code></div>
-        <div class="gr">
-          Returns <code>Objects.hashCode(id)</code>, which evaluates to <code>0</code> for all transient
-          (unsaved) <code>User</code> instances. All transient users collide into the same bucket in any
-          hash-based collection. This is a documented JPA constraint but can cause silent performance
-          degradation if Users are stored in Sets before persistence.
-          <strong>Reviewer question:</strong> Is the hash-bucket collision acceptable, or should transient
-          Users use a natural-key hash as a fallback?
+      <!-- Gap card 2 -->
+      <div class="gap-card gap-collapsible" id="gap2">
+        <div class="gap-header" onclick="toggleGap('gap2')">
+          <span class="gt">2. <code>User.hashCode()</code></span>
+          <div class="gf" style="margin:2px 0 0"><code>src/main/java/com/example/legacy/model/User.java</code></div>
+          <span class="gap-chevron">▼</span>
+        </div>
+        <div class="gap-body">
+          <div class="gr" style="margin-top:10px">
+            Returns <code>Objects.hashCode(id)</code>, which evaluates to <code>0</code> for all transient
+            (unsaved) <code>User</code> instances. All transient users collide into the same bucket in any
+            hash-based collection. This is a documented JPA constraint but can cause silent performance
+            degradation if Users are stored in Sets before persistence.<br><br>
+            <strong>Reviewer question:</strong> Is the hash-bucket collision acceptable, or should transient
+            Users use a natural-key hash as a fallback?
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <span class="gap-badge">JPA Constraint</span>
+            <span class="gap-badge warn">Review Needed</span>
+          </div>
         </div>
       </div>
 
-      <div class="gap-card">
-        <div class="gt">3. <code>UserService.deleteUser(Long id)</code></div>
-        <div class="gf"><code>src/main/java/com/example/legacy/service/UserService.java:63</code></div>
-        <div class="gr">
-          Calls <code>deleteById</code> without first checking whether the entity exists.
-          Spring Data's <code>deleteById</code> silently no-ops on a missing ID — it does not throw
-          an exception by default. The API caller receives HTTP 204 No Content regardless of whether
-          a record was actually deleted.
-          <strong>Reviewer question:</strong> Should <code>DELETE /api/users/{id}</code> return HTTP 404
-          when the user doesn't exist, or is 204-always the intentional contract?
+      <!-- Gap card 3 -->
+      <div class="gap-card gap-collapsible" id="gap3">
+        <div class="gap-header" onclick="toggleGap('gap3')">
+          <span class="gt">3. <code>UserService.deleteUser(Long id)</code></span>
+          <div class="gf" style="margin:2px 0 0"><code>src/main/java/com/example/legacy/service/UserService.java:63</code></div>
+          <span class="gap-chevron">▼</span>
+        </div>
+        <div class="gap-body">
+          <div class="gr" style="margin-top:10px">
+            Calls <code>deleteById</code> without first checking whether the entity exists.
+            Spring Data's <code>deleteById</code> silently no-ops on a missing ID — it does not throw
+            an exception by default. The API caller receives HTTP 204 No Content regardless of whether
+            a record was actually deleted.<br><br>
+            <strong>Reviewer question:</strong> Should <code>DELETE /api/users/{id}</code> return HTTP 404
+            when the user doesn't exist, or is 204-always the intentional contract?
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <span class="gap-badge">Silent No-op</span>
+            <span class="gap-badge warn">Review Needed</span>
+          </div>
         </div>
       </div>
 
-      <p style="font-size:12px;color:var(--muted);margin-top:8px;">
-        Full details in <code>reports/knowledge_gaps.md</code>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;">
+        Full details in
+        <span id="openKnowledgeMd" style="color:var(--accent);cursor:pointer;text-decoration:underline;font-weight:600">
+          reports/knowledge_gaps.md ↗
+        </span>
       </p>
+    </div>
+
+    <!-- ── knowledge_gaps.md modal ── -->
+    <div id="mdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center">
+      <div style="background:#fff;border-radius:10px;width:min(680px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb">
+          <span style="font-weight:700;font-size:14px">reports/knowledge_gaps.md</span>
+          <span onclick="document.getElementById('mdModal').style.display='none'" style="cursor:pointer;font-size:18px;color:#57606a;line-height:1">✕</span>
+        </div>
+        <div style="overflow-y:auto;padding:20px 24px;font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;line-height:1.8;color:#1f2328;white-space:pre-wrap;background:#fafafa;border-radius:0 0 10px 10px"># knowledge_gaps.md — SpringPhoenix
+Generated by: SpringPhoenix Modernization Pipeline (IBM Bob 2.0)
+Module: com.example.legacy
+Scanned: 2026-09-27 05:44 UTC
+
+---
+
+## Gap 1 — User.equals(Object o)
+File: src/main/java/com/example/legacy/model/User.java
+
+**Why flagged:**
+Uses surrogate-key-only equality. Two entities with identical field values
+but null IDs (transient, not yet persisted) are NOT considered equal.
+This is a documented JPA pattern but creates surprising behavior in
+Set / HashMap use before first persist.
+
+**Suggested reviewer question:**
+Is the intent to never treat two unsaved Users as equal, or should
+natural-key equality (username + email) apply to transient instances?
+
+---
+
+## Gap 2 — User.hashCode()
+File: src/main/java/com/example/legacy/model/User.java
+
+**Why flagged:**
+Returns Objects.hashCode(id), which evaluates to 0 for all transient
+(unsaved) User instances. All transient users collide into the same
+bucket in any hash-based collection.
+
+**Suggested reviewer question:**
+Is the hash-bucket collision for transient Users acceptable, or should
+a natural-key hash (username + email) be used as fallback?
+
+---
+
+## Gap 3 — UserService.deleteUser(Long id)
+File: src/main/java/com/example/legacy/service/UserService.java:63
+
+**Why flagged:**
+Calls deleteById without first checking whether the entity exists.
+Spring Data's deleteById silently no-ops on a missing ID — it does NOT
+throw an exception by default. The API caller receives HTTP 204 No Content
+regardless of whether a record was actually deleted.
+
+**Suggested reviewer question:**
+Should DELETE /api/users/{id} return HTTP 404 when the user doesn't
+exist, or is 204-always the intentional contract?
+
+---
+
+## Action Required
+All 3 items above require a human decision before the knowledge doc
+is marked complete. Assign to: module owner / lead developer.
+</div>
+      </div>
     </div>
 
   </main>
@@ -1148,21 +1275,22 @@ void updateUser_returnsEmpty_whenNotFound() {
 
   // ── Dashboard: interactive pipeline runner ──
   const STAGES = [
-    { id: 'stage0',    label: 'Stage 0 — Pre-Flight Baseline',       badge: '$0 token cost', color: '#3b82d4',  duration: 600,
+    { id: 'stage0',    label: 'Stage 0 — Pre-Flight Baseline',       badge: '$0 token cost', color: '#3b82d4',  duration: 1800,
       logs: ['[Bob] Ingesting README.md and architecture docs…', '[Shell] mvn clean test → 0 tests, 0% coverage', '[Bob] Baseline captured → reports/baseline.json', '[Bob] Target: Java 8→21, Spring Boot 2.7→3.2'] },
-    { id: 'stage1',    label: 'Subagent 1 — Baseline & Coverage',     badge: 'JaCoCo gate',  color: '#1a7f37',  duration: 900,
+    { id: 'stage1',    label: 'Subagent 1 — Baseline & Coverage',     badge: 'JaCoCo gate',  color: '#1a7f37',  duration: 2400,
       logs: ['[SA-1] Spawning isolated subagent context…', '[Qwen] Generating JUnit 5 + Mockito tests…', '[JaCoCo] Line coverage: 95.65% ✓', '[JaCoCo] Branch coverage: 100% ✓  Gate passed!'] },
-    { id: 'approval',  label: 'Human Approval Gate',                  badge: 'interactive',  color: '#b45309',  duration: 700,
+    { id: 'approval',  label: 'Human Approval Gate',                  badge: 'interactive',  color: '#b45309',  duration: 1800,
       logs: ['[Bob] Presenting refactor plan to developer…', '[Bob] Flagged 2 business-logic items for review', '[Human] ✓ Approved — proceeding to modernization'] },
-    { id: 'stage2',    label: 'Subagent 2 — Modernize & Verify',      badge: 'self-healing', color: '#1a7f37',  duration: 1100,
+    { id: 'stage2',    label: 'Subagent 2 — Modernize & Verify',      badge: 'self-healing', color: '#1a7f37',  duration: 3000,
       logs: ['[SA-2] javax.* → jakarta.* migration applied', '[Qwen] @Transactional annotations added', '[Qwen] updateUser() endpoint added', '[Docker] PostgreSQL container started (Testcontainers)', '[Maven] mvn test → 72/72 passed ✓  Self-heal: 0 cycles'] },
-    { id: 'stage3',    label: 'Subagent 3 — Mutation Guard',          badge: 'PITest',       color: '#7c5cd8',  duration: 900,
+    { id: 'stage3',    label: 'Subagent 3 — Mutation Guard',          badge: 'PITest',       color: '#7c5cd8',  duration: 2400,
       logs: ['[SA-3] Running PITest mutation engine…', '[PITest] 26 mutants injected into bytecode', '[PITest] 26/26 killed — 0 surviving mutants ✓', '[SA-3] Assertion hardening: 0 cycles needed'] },
-    { id: 'impact',    label: 'Output — Reports Generated',           badge: 'complete',     color: '#1a7f37',  duration: 400,
+    { id: 'impact',    label: 'Output — Reports Generated',           badge: 'complete',     color: '#1a7f37',  duration: 1200,
       logs: ['[Reporter] impact_report.html generated', '[Reporter] knowledge_gaps.md → 3 gaps flagged', '[Bob] Pipeline complete in 59s ✓'] },
   ];
 
   let pipelineRunning = false;
+  let pipelineResume  = null;   // resolve fn to unblock the approval pause
 
   function buildPipelineStages(activeIdx) {
     const container = document.getElementById('pipelineStages');
@@ -1196,14 +1324,17 @@ void updateUser_returnsEmpty_whenNotFound() {
     if (pipelineRunning) return;
     pipelineRunning = true;
 
-    const btn = document.getElementById('btnRunPipeline');
-    btn.disabled = true;
-    btn.textContent = '⏳ Running…';
+    const btn     = document.getElementById('btnRunPipeline');
+    const heroBtn = document.getElementById('heroRunBtn');
+    btn.disabled     = true;
+    btn.textContent  = '⏳ Running…';
+    heroBtn.disabled    = true;
+    heroBtn.textContent = '⏳ Running…';
 
-    const logBox  = document.getElementById('pipelineLog');
+    const logBox   = document.getElementById('pipelineLog');
     const logLines = document.getElementById('logLines');
-    logBox.style.display  = 'block';
-    logLines.innerHTML    = '';
+    logBox.style.display = 'block';
+    logLines.innerHTML   = '';
 
     // reset stats to zero
     ['statLineCov','statBranchCov','statMutation','statTests','statGaps','statHeal'].forEach(id => {
@@ -1226,14 +1357,62 @@ void updateUser_returnsEmpty_whenNotFound() {
       logLines.appendChild(line);
       logLines.scrollTop = logLines.scrollHeight;
     }
-
     function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    for (let i = 0; i < STAGES.length; i++) {
+    // ── run stages 0 & 1 (pre-approval) ──
+    for (let i = 0; i <= 1; i++) {
       const s = STAGES[i];
       buildPipelineStages(i);
       for (const log of s.logs) {
-        appendLog(log, log.includes('✓') ? '#1a7f37' : log.includes('[Human]') ? '#f59e0b' : '#8b949e');
+        appendLog(log, log.includes('✓') ? '#1a7f37' : '#8b949e');
+        await delay(s.duration / s.logs.length);
+      }
+      buildPipelineStages(i + 1);
+    }
+
+    // ── pause: navigate to approval page and wait for human ──
+    appendLog('[Bob] ⏸ Pipeline paused — awaiting human approval…', '#f59e0b');
+    buildPipelineStages(2); // highlight approval stage as "running"
+    btn.textContent     = '⏸ Awaiting Approval…';
+    heroBtn.textContent = '⏸ Awaiting Approval…';
+
+    // navigate to approval screen
+    navigateTo('approval');
+
+    // wait until approve or reject is clicked
+    const approved = await new Promise(resolve => { pipelineResume = resolve; });
+    pipelineResume = null;
+
+    if (!approved) {
+      // rejected — abort
+      appendLog('[Bob] ⛔ Pipeline aborted by user.', '#cf222e');
+      buildPipelineStages(null);
+      btn.disabled        = false;
+      btn.textContent     = '↺ Re-run Pipeline';
+      heroBtn.disabled    = false;
+      heroBtn.textContent = '▶ Run Pipeline';
+      pipelineRunning = false;
+      navigateTo('overview');
+      return;
+    }
+
+    // approved — return to dashboard and scroll straight to pipeline stages card
+    navigateTo('overview');
+    appendLog('[Human] ✓ Approved — resuming pipeline…', '#f59e0b');
+    buildPipelineStages(3);
+    setTimeout(() => {
+      const pipelineCard = document.getElementById('btnRunPipeline').closest('.card');
+      pipelineCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      pipelineCard.style.transition = 'box-shadow .3s';
+      pipelineCard.style.boxShadow  = '0 0 0 3px #3b82d4';
+      setTimeout(() => { pipelineCard.style.boxShadow = ''; }, 800);
+    }, 100);
+
+    for (let i = 3; i < STAGES.length; i++) {
+      const s = STAGES[i];
+      buildPipelineStages(i);
+      for (const log of s.logs) {
+        appendLog(log, log.includes('✓') ? '#1a7f37' : '#8b949e');
         await delay(s.duration / s.logs.length);
       }
       buildPipelineStages(i + 1);
@@ -1248,12 +1427,25 @@ void updateUser_returnsEmpty_whenNotFound() {
     buildTestBars();
 
     appendLog('[✓] Pipeline complete — 59s total', '#3b82d4');
-    btn.disabled    = false;
-    btn.textContent = '↺ Re-run Pipeline';
+    navigateTo('overview');
+    btn.disabled        = false;
+    btn.textContent     = '↺ Re-run Pipeline';
+    heroBtn.disabled    = false;
+    heroBtn.textContent = '▶ Run Pipeline';
     pipelineRunning = false;
   }
 
   document.getElementById('btnRunPipeline').addEventListener('click', runPipeline);
+
+  document.getElementById('heroRunBtn').addEventListener('click', () => {
+    if (pipelineRunning) return;
+    const pipelineCard = document.getElementById('btnRunPipeline').closest('.card');
+    pipelineCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    pipelineCard.style.transition = 'box-shadow .3s';
+    pipelineCard.style.boxShadow  = '0 0 0 3px #3b82d4';
+    setTimeout(() => { pipelineCard.style.boxShadow = ''; }, 700);
+    setTimeout(runPipeline, 400);
+  });
 
   // Build initial idle state and render bars on load
   buildPipelineStages(null);
@@ -1265,8 +1457,27 @@ void updateUser_returnsEmpty_whenNotFound() {
     navItems.forEach(n => n.classList.remove('active'));
     const target = document.querySelector(`.nav-item[data-screen="${screenId}"]`);
     if (target) target.classList.add('active');
-    screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + screenId));
+    screens.forEach(s => {
+      s.classList.remove('active');
+      if (s.id === 'screen-' + screenId) s.classList.add('active');
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetGateUI() {
+    const box   = document.getElementById('gateBox');
+    const title = document.getElementById('gateTitle');
+    const desc  = document.getElementById('gateDesc');
+    const btnA  = document.getElementById('btnApprove');
+    const btnR  = document.getElementById('btnReject');
+    box.style.background  = '';
+    box.style.borderColor = '';
+    title.textContent     = '🔒 Pipeline Paused — Awaiting Human Approval';
+    desc.innerHTML        = 'Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.';
+    btnA.style.display    = '';
+    btnA.textContent      = '✓ Approve & Continue';
+    btnR.style.display    = '';
+    btnR.textContent      = '⤫ Reject & Stop';
   }
 
   document.getElementById('btnApprove').addEventListener('click', () => {
@@ -1276,45 +1487,43 @@ void updateUser_returnsEmpty_whenNotFound() {
     const btnA  = document.getElementById('btnApprove');
     const btnR  = document.getElementById('btnReject');
 
-    // Flash approved state briefly, then navigate
-    box.style.background   = '#f0fdf4';
-    box.style.borderColor  = '#86efac';
-    title.textContent      = '✅ Approved — Launching Subagent 2';
-    desc.textContent       = 'Authorization confirmed. Spawning Subagent 2 for modernization…';
-    btnA.style.display     = 'none';
-    btnR.style.display     = 'none';
+    box.style.background  = '#f0fdf4';
+    box.style.borderColor = '#86efac';
+    title.textContent     = '✅ Approved — Launching Subagent 2';
+    desc.textContent      = 'Authorization confirmed. Spawning Subagent 2 for modernization…';
+    btnA.style.display    = 'none';
+    btnR.style.display    = 'none';
 
     setTimeout(() => {
-      // Reset gate for next visit
-      box.style.background   = '';
-      box.style.borderColor  = '';
-      title.textContent      = '🔒 Pipeline Paused — Awaiting Human Approval';
-      desc.innerHTML         = 'Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.';
-      btnA.style.display     = '';
-      btnR.style.display     = '';
-      navigateTo('stage2');
-    }, 900);
+      resetGateUI();
+      // if pipeline is waiting, resume it; otherwise just navigate
+      if (pipelineResume) {
+        pipelineResume(true);
+      } else {
+        navigateTo('stage2');
+      }
+    }, 800);
   });
 
   document.getElementById('btnReject').addEventListener('click', () => {
     const box   = document.getElementById('gateBox');
     const title = document.getElementById('gateTitle');
     const desc  = document.getElementById('gateDesc');
+    const btnR  = document.getElementById('btnReject');
+
     box.style.background  = '#fff1f2';
     box.style.borderColor = '#fca5a5';
     title.textContent     = '⛔ Pipeline Stopped';
     desc.textContent      = 'Modernization rejected. No code changes have been made. Re-run the pipeline when ready.';
     document.getElementById('btnApprove').style.display = 'none';
-    document.getElementById('btnReject').textContent    = '↩ Reset';
-    document.getElementById('btnReject').onclick = () => {
-      box.style.background  = '';
-      box.style.borderColor = '';
-      title.textContent     = '🔒 Pipeline Paused — Awaiting Human Approval';
-      desc.innerHTML        = 'Coverage gate passed (95.65% lines, 100% branches). Bob has prepared the modernization plan below.<br>Review the proposed changes and flagged items before proceeding.';
-      document.getElementById('btnApprove').style.display = '';
-      document.getElementById('btnReject').textContent    = '⤫ Reject & Stop';
-      document.getElementById('btnReject').onclick        = null;
+    btnR.textContent = '↩ Reset';
+
+    const onReset = () => {
+      resetGateUI();
+      btnR.removeEventListener('click', onReset);
+      if (pipelineResume) pipelineResume(false);
     };
+    btnR.addEventListener('click', onReset);
   });
 
   // ── Draggable sidebar ──
@@ -1381,6 +1590,23 @@ void updateUser_returnsEmpty_whenNotFound() {
   }, { passive: false });
 
   document.addEventListener('touchend', () => { dragging = false; });
+
+  // ── Collapsible gap cards ──
+  function toggleGap(id) {
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+
+  // ── knowledge_gaps.md modal ──
+  document.getElementById('openKnowledgeMd').addEventListener('click', () => {
+    const modal = document.getElementById('mdModal');
+    modal.style.display = 'flex';
+  });
+  document.getElementById('mdModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('mdModal')) {
+      document.getElementById('mdModal').style.display = 'none';
+    }
+  });
 </script>
 
 </body>
