@@ -1,4 +1,5 @@
 target/
-*.class
-*.pyc
 __pycache__/
+*.pyc
+.DS_Store
+.bob/artifacts/
