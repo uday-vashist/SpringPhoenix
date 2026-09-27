@@ -352,92 +352,100 @@
 
     <!-- ─── OVERVIEW ─── -->
     <div class="screen active" id="screen-overview">
+
+      <!-- Hero -->
       <div class="hero">
         <h1>SpringPhoenix — Modernization Pipeline</h1>
         <div class="meta">
           Module: <strong>com.example.legacy</strong> (UserController · UserService · UserRepository · User)<br>
           Orchestrator: IBM Bob 2.0 · Code Tool: Qwen 2.5 Coder<br>
-          Pipeline completed in <strong>59 seconds</strong>
+          Pipeline runtime: <strong>59 seconds</strong>
         </div>
-        <span class="badge-hero">✓ All 72 tests passing — 0 surviving mutants</span>
+        <span class="badge-hero" id="heroBadge">✓ All 72 tests passing — 0 surviving mutants</span>
       </div>
 
+      <!-- Animated stat cards -->
       <div class="card-row cols-3">
-        <div class="stat green">
+        <div class="stat green" style="cursor:pointer" title="Click to see coverage details" onclick="navigateTo('stage1')">
           <div class="s-label">Line Coverage</div>
-          <div class="s-value">95.7%</div>
-          <div class="s-sub">44 / 46 lines</div>
+          <div class="s-value" id="statLineCov">0%</div>
+          <div class="s-sub">44 / 46 lines · click to explore</div>
         </div>
-        <div class="stat green">
+        <div class="stat green" style="cursor:pointer" title="Click to see coverage details" onclick="navigateTo('stage1')">
           <div class="s-label">Branch Coverage</div>
-          <div class="s-value">100%</div>
+          <div class="s-value" id="statBranchCov">0%</div>
           <div class="s-sub">Gate: ≥ 80%</div>
         </div>
-        <div class="stat blue">
+        <div class="stat blue" style="cursor:pointer" title="Click to see mutation details" onclick="navigateTo('stage3')">
           <div class="s-label">Mutation Score</div>
-          <div class="s-value">100%</div>
-          <div class="s-sub">26 / 26 killed</div>
+          <div class="s-value" id="statMutation">0%</div>
+          <div class="s-sub">26 / 26 killed · click to explore</div>
         </div>
       </div>
       <div class="card-row cols-3">
-        <div class="stat green">
+        <div class="stat green" style="cursor:pointer" onclick="navigateTo('impact')">
           <div class="s-label">Tests Passing</div>
-          <div class="s-value">72</div>
-          <div class="s-sub">0 failures</div>
+          <div class="s-value" id="statTests">0</div>
+          <div class="s-sub">0 failures · click for breakdown</div>
         </div>
         <div class="stat purple">
           <div class="s-label">Self-Heal Cycles</div>
-          <div class="s-value">0</div>
+          <div class="s-value" id="statHeal">—</div>
           <div class="s-sub">Not triggered</div>
         </div>
-        <div class="stat amber">
+        <div class="stat amber" style="cursor:pointer" onclick="navigateTo('gaps')">
           <div class="s-label">Logic Gaps Flagged</div>
-          <div class="s-value">3</div>
-          <div class="s-sub">Pending human review</div>
+          <div class="s-value" id="statGaps">0</div>
+          <div class="s-sub">Pending review · click to inspect</div>
         </div>
       </div>
 
+      <!-- Coverage progress bars -->
       <div class="card">
-        <h3>Pipeline Timeline</h3>
-        <div class="timeline">
-          <div class="tl-step done">
-            <div class="tl-title">Stage 0 — Pre-Flight Baseline <span class="badge badge-green">$0 token cost</span></div>
-            <div class="tl-body">Deterministic shell capture via <code>mvn test</code>. Bob ingests README, architecture docs, and specs via Document Understanding. Baseline JSON written to <code>reports/baseline.json</code>.</div>
+        <h3>Coverage Progress</h3>
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span>Line Coverage</span><span style="color:var(--green);font-weight:600" id="barLineLbl">0%</span>
           </div>
-          <div class="tl-step done">
-            <div class="tl-title">Subagent 1 — Baseline & Coverage Gate</div>
-            <div class="tl-body">Qwen 2.5 Coder generates JUnit 5 + Mockito tests. JaCoCo audits line &amp; branch coverage. Gate passed at 95.65% / 100% on first attempt.</div>
+          <div class="prog-wrap"><div class="prog-fill" id="barLine" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">80% gate threshold</div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span>Branch Coverage</span><span style="color:var(--green);font-weight:600" id="barBranchLbl">0%</span>
           </div>
-          <div class="tl-step done">
-            <div class="tl-title">Human Approval Gate <span class="badge badge-blue">Interactive</span></div>
-            <div class="tl-body">Bob CLI presented refactor plan and flagged business-logic items. Developer reviewed and approved.</div>
+          <div class="prog-wrap"><div class="prog-fill" id="barBranch" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span>Mutation Score</span><span style="color:var(--accent);font-weight:600" id="barMutLbl">0%</span>
           </div>
-          <div class="tl-step done">
-            <div class="tl-title">Subagent 2 — Modernize & Verify</div>
-            <div class="tl-body">Java 8 → 21, Spring Boot 2 → 3, <code>javax.*</code> → <code>jakarta.*</code>. Testcontainers spun up real PostgreSQL. All 72 tests passed. Self-heal loops: 0.</div>
-          </div>
-          <div class="tl-step done">
-            <div class="tl-title">Subagent 3 — Mutation Guardrail</div>
-            <div class="tl-body">PITest injected 26 bytecode mutants. All 26 killed on first pass. Zero assertion-strengthening cycles needed.</div>
-          </div>
-          <div class="tl-step done">
-            <div class="tl-title">Output — Impact Report &amp; Knowledge Doc</div>
-            <div class="tl-body">Generated <code>reports/impact_report.html</code>, <code>reports/impact_report.md</code>, and <code>reports/knowledge_gaps.md</code>.</div>
-          </div>
+          <div class="prog-wrap"><div class="prog-fill blue" id="barMut" style="width:0%"></div></div>
         </div>
       </div>
 
+      <!-- Interactive pipeline runner -->
       <div class="card">
-        <h3>Why SpringPhoenix Exists</h3>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
-          Legacy Spring Boot services carry two kinds of debt: <strong>outdated code</strong> and <strong>undocumented knowledge</strong>.
-          Upgrading them manually is high-risk — nobody wants to touch code when nobody can guarantee nothing breaks,
-          and the reasoning behind half the implementation lives only in the head of a developer who might leave tomorrow.
-          SpringPhoenix uses IBM Bob 2.0 to pay off both debts at once: automated test generation locks in behavior
-          before any line is changed, parallel subagents isolate context to prevent hallucinations, and a living
-          knowledge document captures institutional logic along the way.
-        </p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <h3 style="margin:0">Pipeline Stages</h3>
+          <button class="btn btn-primary" id="btnRunPipeline" style="font-size:12px;padding:6px 16px">▶ Run Pipeline</button>
+        </div>
+
+        <div id="pipelineStages">
+          <!-- Stage rows injected by JS -->
+        </div>
+
+        <div id="pipelineLog" style="display:none;margin-top:12px">
+          <div style="background:#0d1117;border-radius:6px;padding:12px 14px;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;color:#8b949e;max-height:140px;overflow-y:auto;line-height:1.8" id="logLines"></div>
+        </div>
       </div>
+
+      <!-- Mini test breakdown bar chart -->
+      <div class="card">
+        <h3>Test Suite — At a Glance</h3>
+        <div id="testBars" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+      </div>
+
     </div>
 
     <!-- ─── ARCHITECTURE ─── -->
@@ -1067,6 +1075,190 @@ void updateUser_returnsEmpty_whenNotFound() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
+
+  // ── Dashboard: animated counters + progress bars ──
+  const FINAL = { line: 95.65, branch: 100, mutation: 100, tests: 72, heal: 0, gaps: 3 };
+
+  function animateDashboard() {
+    const dur = 1400;
+    const start = performance.now();
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function step(now) {
+      const p = Math.min(easeOut((now - start) / dur), 1);
+
+      document.getElementById('statLineCov').textContent   = (FINAL.line   * p).toFixed(1) + '%';
+      document.getElementById('statBranchCov').textContent = (FINAL.branch * p).toFixed(0) + '%';
+      document.getElementById('statMutation').textContent  = (FINAL.mutation * p).toFixed(0) + '%';
+      document.getElementById('statTests').textContent     = Math.round(FINAL.tests * p);
+      document.getElementById('statGaps').textContent      = Math.round(FINAL.gaps  * p);
+      if (p >= 1) document.getElementById('statHeal').textContent = '0';
+
+      document.getElementById('barLine').style.width   = (FINAL.line   * p) + '%';
+      document.getElementById('barBranch').style.width = (FINAL.branch * p) + '%';
+      document.getElementById('barMut').style.width    = (FINAL.mutation * p) + '%';
+
+      document.getElementById('barLineLbl').textContent   = (FINAL.line   * p).toFixed(1) + '%';
+      document.getElementById('barBranchLbl').textContent = (FINAL.branch * p).toFixed(0) + '%';
+      document.getElementById('barMutLbl').textContent    = (FINAL.mutation * p).toFixed(0) + '%';
+
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── Dashboard: test suite mini bar chart ──
+  const TEST_DATA = [
+    { name: 'UserControllerIntegrationTest', type: 'Integration', tests: 15, time: 2.63 },
+    { name: 'UserRepositoryIntegrationTest', type: 'Integration', tests: 13, time: 8.15 },
+    { name: 'UserTest',                      type: 'Unit',        tests: 12, time: 0.01 },
+    { name: 'UserServiceIntegrationTest',    type: 'Integration', tests: 12, time: 0.40 },
+    { name: 'UserServiceTest',               type: 'Unit',        tests:  6, time: 0.27 },
+    { name: 'UserControllerTest',            type: 'Unit',        tests:  7, time: 0.15 },
+    { name: 'UserRepositoryTest',            type: 'Unit',        tests:  5, time: 0.80 },
+    { name: 'SpringPhoenixApplicationTests', type: 'Unit',        tests:  2, time: 0.70 },
+  ];
+  const MAX_TESTS = 15;
+
+  function buildTestBars() {
+    const container = document.getElementById('testBars');
+    container.innerHTML = '';
+    TEST_DATA.forEach(d => {
+      const pct = (d.tests / MAX_TESTS) * 100;
+      const color = d.type === 'Integration' ? 'var(--accent)' : 'var(--green)';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;font-size:12px';
+      row.innerHTML = `
+        <span style="width:230px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${d.name}</span>
+        <div style="flex:1;background:#e5e7eb;border-radius:4px;height:14px;overflow:hidden">
+          <div class="bar-animate" style="height:100%;width:0%;background:${color};border-radius:4px;transition:width 1s ease"></div>
+        </div>
+        <span style="width:28px;text-align:right;font-weight:600;color:var(--muted)">${d.tests}</span>
+        <span style="width:48px;text-align:right;color:var(--muted);font-size:10px">${d.time}s</span>
+        <span style="width:70px;flex-shrink:0;font-size:10px;text-align:center;padding:1px 6px;border-radius:10px;background:${d.type==='Integration'?'#dbeafe':'#dcfce7'};color:${d.type==='Integration'?'#1d4ed8':'#15803d'}">${d.type}</span>
+      `;
+      container.appendChild(row);
+      // animate after paint
+      setTimeout(() => {
+        row.querySelector('.bar-animate').style.width = pct + '%';
+      }, 200);
+    });
+  }
+
+  // ── Dashboard: interactive pipeline runner ──
+  const STAGES = [
+    { id: 'stage0',    label: 'Stage 0 — Pre-Flight Baseline',       badge: '$0 token cost', color: '#3b82d4',  duration: 600,
+      logs: ['[Bob] Ingesting README.md and architecture docs…', '[Shell] mvn clean test → 0 tests, 0% coverage', '[Bob] Baseline captured → reports/baseline.json', '[Bob] Target: Java 8→21, Spring Boot 2.7→3.2'] },
+    { id: 'stage1',    label: 'Subagent 1 — Baseline & Coverage',     badge: 'JaCoCo gate',  color: '#1a7f37',  duration: 900,
+      logs: ['[SA-1] Spawning isolated subagent context…', '[Qwen] Generating JUnit 5 + Mockito tests…', '[JaCoCo] Line coverage: 95.65% ✓', '[JaCoCo] Branch coverage: 100% ✓  Gate passed!'] },
+    { id: 'approval',  label: 'Human Approval Gate',                  badge: 'interactive',  color: '#b45309',  duration: 700,
+      logs: ['[Bob] Presenting refactor plan to developer…', '[Bob] Flagged 2 business-logic items for review', '[Human] ✓ Approved — proceeding to modernization'] },
+    { id: 'stage2',    label: 'Subagent 2 — Modernize & Verify',      badge: 'self-healing', color: '#1a7f37',  duration: 1100,
+      logs: ['[SA-2] javax.* → jakarta.* migration applied', '[Qwen] @Transactional annotations added', '[Qwen] updateUser() endpoint added', '[Docker] PostgreSQL container started (Testcontainers)', '[Maven] mvn test → 72/72 passed ✓  Self-heal: 0 cycles'] },
+    { id: 'stage3',    label: 'Subagent 3 — Mutation Guard',          badge: 'PITest',       color: '#7c5cd8',  duration: 900,
+      logs: ['[SA-3] Running PITest mutation engine…', '[PITest] 26 mutants injected into bytecode', '[PITest] 26/26 killed — 0 surviving mutants ✓', '[SA-3] Assertion hardening: 0 cycles needed'] },
+    { id: 'impact',    label: 'Output — Reports Generated',           badge: 'complete',     color: '#1a7f37',  duration: 400,
+      logs: ['[Reporter] impact_report.html generated', '[Reporter] knowledge_gaps.md → 3 gaps flagged', '[Bob] Pipeline complete in 59s ✓'] },
+  ];
+
+  let pipelineRunning = false;
+
+  function buildPipelineStages(activeIdx) {
+    const container = document.getElementById('pipelineStages');
+    container.innerHTML = '';
+    STAGES.forEach((s, i) => {
+      const state = activeIdx === null ? 'idle'
+                  : i < activeIdx  ? 'done'
+                  : i === activeIdx ? 'running'
+                  : 'idle';
+      const dot  = state === 'done' ? '✓' : state === 'running' ? '◉' : '○';
+      const clr  = state === 'done' ? '#1a7f37' : state === 'running' ? s.color : '#8b949e';
+      const row  = document.createElement('div');
+      row.style.cssText = `display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;margin-bottom:4px;cursor:pointer;
+        background:${state==='running' ? '#f8fafc' : 'transparent'};
+        border:1px solid ${state==='running' ? '#e5e7eb' : 'transparent'};
+        transition:background .2s`;
+      row.innerHTML = `
+        <span style="font-size:14px;font-weight:700;color:${clr};width:18px;text-align:center">${dot}</span>
+        <span style="flex:1;font-size:13px;font-weight:${state==='running'?'700':'400'};color:${state==='idle'?'var(--muted)':'var(--text)'}">${s.label}</span>
+        <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:${state==='done'?'#dcfce7':state==='running'?'#dbeafe':'#f0f0f0'};
+              color:${state==='done'?'#15803d':state==='running'?'#1d4ed8':'#8b949e'};font-weight:600">${s.badge}</span>
+        ${state==='running' ? '<span style="font-size:11px;color:var(--accent)">running…</span>' : ''}
+        ${state==='done'    ? `<span style="font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline" onclick="navigateTo('${s.id}')">view →</span>` : ''}
+      `;
+      row.addEventListener('click', () => navigateTo(s.id));
+      container.appendChild(row);
+    });
+  }
+
+  async function runPipeline() {
+    if (pipelineRunning) return;
+    pipelineRunning = true;
+
+    const btn = document.getElementById('btnRunPipeline');
+    btn.disabled = true;
+    btn.textContent = '⏳ Running…';
+
+    const logBox  = document.getElementById('pipelineLog');
+    const logLines = document.getElementById('logLines');
+    logBox.style.display  = 'block';
+    logLines.innerHTML    = '';
+
+    // reset stats to zero
+    ['statLineCov','statBranchCov','statMutation','statTests','statGaps','statHeal'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '0';
+    });
+    ['barLine','barBranch','barMut'].forEach(id => {
+      document.getElementById(id).style.width = '0%';
+      document.getElementById(id).style.transition = 'none';
+    });
+    ['barLineLbl','barBranchLbl','barMutLbl'].forEach(id => {
+      document.getElementById(id).textContent = '0%';
+    });
+    document.getElementById('statHeal').textContent = '—';
+
+    function appendLog(msg, color) {
+      const line = document.createElement('div');
+      line.style.color = color || '#8b949e';
+      line.textContent = msg;
+      logLines.appendChild(line);
+      logLines.scrollTop = logLines.scrollHeight;
+    }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    for (let i = 0; i < STAGES.length; i++) {
+      const s = STAGES[i];
+      buildPipelineStages(i);
+      for (const log of s.logs) {
+        appendLog(log, log.includes('✓') ? '#1a7f37' : log.includes('[Human]') ? '#f59e0b' : '#8b949e');
+        await delay(s.duration / s.logs.length);
+      }
+      buildPipelineStages(i + 1);
+    }
+
+    // animate stats after completion
+    document.getElementById('statHeal').textContent = '0';
+    ['barLine','barBranch','barMut'].forEach(id => {
+      document.getElementById(id).style.transition = 'width 1s ease';
+    });
+    animateDashboard();
+    buildTestBars();
+
+    appendLog('[✓] Pipeline complete — 59s total', '#3b82d4');
+    btn.disabled    = false;
+    btn.textContent = '↺ Re-run Pipeline';
+    pipelineRunning = false;
+  }
+
+  document.getElementById('btnRunPipeline').addEventListener('click', runPipeline);
+
+  // Build initial idle state and render bars on load
+  buildPipelineStages(null);
+  buildTestBars();
+  animateDashboard();
 
   // ── Approval Gate ──
   function navigateTo(screenId) {
