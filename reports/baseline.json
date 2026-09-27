@@ -3,21 +3,21 @@
   "overall": {
     "name": "SpringPhoenix",
     "missed": 2,
-    "covered": 44,
-    "total": 46,
-    "percentage": 95.65
+    "covered": 82,
+    "total": 84,
+    "percentage": 97.62
   },
   "packages": [
     {
       "name": "com.example.legacy.controller",
       "missed": 0,
-      "covered": 14,
+      "covered": 28,
       "percentage": 100.0
     },
     {
       "name": "com.example.legacy.service",
       "missed": 0,
-      "covered": 12,
+      "covered": 22,
       "percentage": 100.0
     },
     {
@@ -29,7 +29,7 @@
     {
       "name": "com.example.legacy.model",
       "missed": 0,
-      "covered": 17,
+      "covered": 31,
       "percentage": 100.0
     }
   ],
@@ -38,6 +38,18 @@
       "name": "com.example.legacy.controller.UserController",
       "missed": 0,
       "covered": 14,
+      "percentage": 100.0
+    },
+    {
+      "name": "com.example.legacy.controller.ProductController",
+      "missed": 0,
+      "covered": 14,
+      "percentage": 100.0
+    },
+    {
+      "name": "com.example.legacy.service.ProductService",
+      "missed": 0,
+      "covered": 10,
       "percentage": 100.0
     },
     {
@@ -56,6 +68,12 @@
       "name": "com.example.legacy.model.User",
       "missed": 0,
       "covered": 17,
+      "percentage": 100.0
+    },
+    {
+      "name": "com.example.legacy.model.Product",
+      "missed": 0,
+      "covered": 14,
       "percentage": 100.0
     }
   ]

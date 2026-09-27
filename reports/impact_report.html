@@ -129,8 +129,8 @@
   <div class="report-header">
     <h1>SpringPhoenix — Before/After Impact Report</h1>
     <div class="meta">
-      Module: com.example.legacy (UserController · UserService · UserRepository · User)<br>
-      Generated: 2026-09-27 09:27 UTC<br>
+      Module: com.example.legacy (user-module + product-module)<br>
+      Generated: 2026-09-27 11:58 UTC<br>
       Pipeline: SpringPhoenix Modernization Pipeline (IBM Bob 2.0 + JaCoCo + PITest)
     </div>
     <span class="badge">All tests passing — 0 surviving mutants</span>
@@ -140,8 +140,8 @@
   <div class="scorecard-row">
     <div class="scorecard green">
       <div class="label">Line Coverage</div>
-      <div class="value">95.7%</div>
-      <div class="sub">44/46 lines</div>
+      <div class="value">97.6%</div>
+      <div class="sub">82/84 lines</div>
     </div>
     <div class="scorecard green">
       <div class="label">Branch Coverage</div>
@@ -151,11 +151,11 @@
     <div class="scorecard blue">
       <div class="label">Mutation Score</div>
       <div class="value">100%</div>
-      <div class="sub">26/26 killed</div>
+      <div class="sub">42/42 killed</div>
     </div>
     <div class="scorecard green">
       <div class="label">Tests Passing</div>
-      <div class="value">68</div>
+      <div class="value">133</div>
       <div class="sub">0 failures</div>
     </div>
     <div class="scorecard purple">
@@ -165,7 +165,7 @@
     </div>
     <div class="scorecard amber">
       <div class="label">Logic Gaps Flagged</div>
-      <div class="value">3</div>
+      <div class="value">5</div>
       <div class="sub">pending human review</div>
     </div>
   </div>
@@ -185,9 +185,9 @@
       <tbody>
         <tr>
           <td class="metric">Line Coverage %</td>
-          <td class="before">0.00% (0/46 lines)</td>
-          <td class="baseline">95.65% (44/46 lines)</td>
-          <td class="after">95.65% (44/46 lines)</td>
+          <td class="before">0.00% (0/84 lines)</td>
+          <td class="baseline">97.62% (82/84 lines)</td>
+          <td class="after">97.62% (82/84 lines)</td>
         </tr>
         <tr>
           <td class="metric">Branch Coverage %</td>
@@ -199,13 +199,13 @@
           <td class="metric">Mutation Score %</td>
           <td class="before">N/A (no tests existed)</td>
           <td class="baseline">N/A (baseline only)</td>
-          <td class="after">100.0% — 26 killed, 0 survived</td>
+          <td class="after">100.0% — 42 killed, 0 survived</td>
         </tr>
         <tr>
           <td class="metric">Build Pass Rate</td>
           <td class="before">Compiled, 0 tests</td>
           <td class="baseline">Baseline tests pass</td>
-          <td class="after">68/68 (100%) in 37.8s</td>
+          <td class="after">133/133 (100%) in 26.1s</td>
         </tr>
         <tr>
           <td class="metric">Self-Heal Cycles Used</td>
@@ -217,7 +217,7 @@
           <td class="metric">Business-Logic Gaps</td>
           <td class="before">0 (not scanned)</td>
           <td class="baseline">0 (not scanned)</td>
-          <td class="after warn">3 flagged — pending human review</td>
+          <td class="after warn">5 flagged — pending human review</td>
         </tr>
       </tbody>
     </table>
@@ -233,12 +233,30 @@
       <tbody>
         
         <tr>
+          <td><code>ProductControllerIntegrationTest</code></td>
+          <td>Integration</td>
+          <td>15</td>
+          <td class="pass">15</td>
+          <td class="">0</td>
+          <td>19.20</td>
+        </tr>
+        
+        <tr>
+          <td><code>ProductControllerTest</code></td>
+          <td>Unit</td>
+          <td>8</td>
+          <td class="pass">8</td>
+          <td class="">0</td>
+          <td>0.47</td>
+        </tr>
+        
+        <tr>
           <td><code>UserControllerIntegrationTest</code></td>
           <td>Integration</td>
           <td>15</td>
           <td class="pass">15</td>
           <td class="">0</td>
-          <td>27.87</td>
+          <td>0.75</td>
         </tr>
         
         <tr>
@@ -247,16 +265,34 @@
           <td>7</td>
           <td class="pass">7</td>
           <td class="">0</td>
-          <td>0.83</td>
+          <td>0.13</td>
+        </tr>
+        
+        <tr>
+          <td><code>ProductTest</code></td>
+          <td>Unit</td>
+          <td>7</td>
+          <td class="pass">7</td>
+          <td class="">0</td>
+          <td>0.04</td>
         </tr>
         
         <tr>
           <td><code>UserTest</code></td>
           <td>Unit</td>
-          <td>8</td>
-          <td class="pass">8</td>
+          <td>12</td>
+          <td class="pass">12</td>
           <td class="">0</td>
-          <td>0.10</td>
+          <td>0.06</td>
+        </tr>
+        
+        <tr>
+          <td><code>ProductRepositoryIntegrationTest</code></td>
+          <td>Integration</td>
+          <td>11</td>
+          <td class="pass">11</td>
+          <td class="">0</td>
+          <td>1.39</td>
         </tr>
         
         <tr>
@@ -265,7 +301,7 @@
           <td>13</td>
           <td class="pass">13</td>
           <td class="">0</td>
-          <td>4.85</td>
+          <td>0.59</td>
         </tr>
         
         <tr>
@@ -274,7 +310,25 @@
           <td>5</td>
           <td class="pass">5</td>
           <td class="">0</td>
-          <td>1.27</td>
+          <td>0.97</td>
+        </tr>
+        
+        <tr>
+          <td><code>ProductServiceIntegrationTest</code></td>
+          <td>Integration</td>
+          <td>13</td>
+          <td class="pass">13</td>
+          <td class="">0</td>
+          <td>1.80</td>
+        </tr>
+        
+        <tr>
+          <td><code>ProductServiceTest</code></td>
+          <td>Unit</td>
+          <td>7</td>
+          <td class="pass">7</td>
+          <td class="">0</td>
+          <td>0.21</td>
         </tr>
         
         <tr>
@@ -283,7 +337,7 @@
           <td>12</td>
           <td class="pass">12</td>
           <td class="">0</td>
-          <td>2.26</td>
+          <td>0.31</td>
         </tr>
         
         <tr>
@@ -292,7 +346,7 @@
           <td>6</td>
           <td class="pass">6</td>
           <td class="">0</td>
-          <td>0.57</td>
+          <td>0.16</td>
         </tr>
         
         <tr>
@@ -301,17 +355,17 @@
           <td>2</td>
           <td class="pass">2</td>
           <td class="">0</td>
-          <td>0.09</td>
+          <td>0.05</td>
         </tr>
         
       </tbody>
       <tfoot>
         <tr>
           <td colspan="2"><strong>Total</strong></td>
-          <td>68</td>
-          <td class="pass">68</td>
+          <td>133</td>
+          <td class="pass">133</td>
           <td>0</td>
-          <td>37.8</td>
+          <td>26.1</td>
         </tr>
       </tfoot>
     </table>
@@ -328,7 +382,7 @@
   <!-- Business-logic gaps -->
   
   <div class="section">
-    <h2>Business-Logic Gaps Flagged (3)</h2>
+    <h2>Business-Logic Gaps Flagged (5)</h2>
     
     <div class="gap-card">
       <div class="gap-title">1. User.equals(Object o)</div>
@@ -346,6 +400,18 @@
       <div class="gap-title">3. UserService.deleteUser(Long id)</div>
       <div class="gap-file"><code>src/main/java/com/example/legacy/service/UserService.java</code></div>
       <div class="gap-reason">Calls `deleteById` without first checking whether the entity exists. Spring Data's `deleteById` silently no-ops on a mis…</div>
+    </div>
+    
+    <div class="gap-card">
+      <div class="gap-title">4. ProductService.deleteProduct(...)</div>
+      <div class="gap-file"><code>src/main/java/com/example/legacy/Service/ProductService.java</code></div>
+      <div class="gap-reason">Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing…</div>
+    </div>
+    
+    <div class="gap-card">
+      <div class="gap-title">5. UserService.deleteUser(...)</div>
+      <div class="gap-file"><code>src/main/java/com/example/legacy/Service/UserService.java</code></div>
+      <div class="gap-reason">Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing…</div>
     </div>
     
     <p style="font-size:12px;color:#57606a;margin-top:8px;">
@@ -383,8 +449,8 @@
   <div class="section">
     <h2>Parallel Execution Timeline</h2>
     <p style="font-size:12px;color:#57606a;margin-bottom:12px;">
-      Three independent module pipelines ran concurrently
-      (<code>user-domain</code>, <code>user-persistence</code>, <code>user-api</code>).
+      2 independent module pipelines ran concurrently
+      (user-module, product-module).
       The table below proves overlapping execution by wall-clock timestamps.
     </p>
 
@@ -392,27 +458,27 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;">
       <div class="scorecard blue" style="padding:12px 14px;">
         <div class="label">Wall-clock</div>
-        <div class="value" style="font-size:22px;">8.93s</div>
+        <div class="value" style="font-size:22px;">10.26s</div>
         <div class="sub">concurrent total</div>
       </div>
       <div class="scorecard" style="padding:12px 14px;">
         <div class="label">Sequential equiv.</div>
-        <div class="value" style="font-size:22px;">22.97s</div>
+        <div class="value" style="font-size:22px;">19.00s</div>
         <div class="sub">if run one-by-one</div>
       </div>
       <div class="scorecard green" style="padding:12px 14px;">
         <div class="label">Time saved</div>
-        <div class="value" style="font-size:22px;color:#1a7f37;">14.04s</div>
+        <div class="value" style="font-size:22px;color:#1a7f37;">8.74s</div>
         <div class="sub">by parallelism</div>
       </div>
       <div class="scorecard green" style="padding:12px 14px;">
         <div class="label">Speed-up</div>
-        <div class="value" style="font-size:22px;color:#1a7f37;">2.6x</div>
+        <div class="value" style="font-size:22px;color:#1a7f37;">1.9x</div>
         <div class="sub">faster than serial</div>
       </div>
       <div class="scorecard purple" style="padding:12px 14px;">
         <div class="label">Stage overlaps</div>
-        <div class="value" style="font-size:22px;color:#7c5cd8;">13</div>
+        <div class="value" style="font-size:22px;color:#7c5cd8;">5</div>
         <div class="sub">proven concurrent pairs</div>
       </div>
     </div>
@@ -430,25 +496,25 @@
         
         
         <tr>
-          <td><code>user-domain</code></td>
+          <td><code>user-module</code></td>
           <td style="font-size:11px;color:#57606a;">Subagent-1</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:02.582</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:03.850</td>
-          <td>1.27</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:17.587</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:19.608</td>
+          <td>2.02</td>
           <td>
             
             
-            <span style="display:inline-block;width:8px;height:10px;
+            <span style="display:inline-block;width:24px;height:10px;
               background:#3b82d4;border-radius:2px;vertical-align:middle;"></span>
           </td>
         </tr>
         
         <tr>
-          <td><code>user-persistence</code></td>
+          <td><code>product-module</code></td>
           <td style="font-size:11px;color:#57606a;">Subagent-1</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:02.586</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:04.450</td>
-          <td>1.86</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:17.588</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:19.208</td>
+          <td>1.62</td>
           <td>
             
             
@@ -458,39 +524,25 @@
         </tr>
         
         <tr>
-          <td><code>user-api</code></td>
-          <td style="font-size:11px;color:#57606a;">Subagent-1</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:02.588</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:04.050</td>
-          <td>1.46</td>
-          <td>
-            
-            
-            <span style="display:inline-block;width:8px;height:10px;
-              background:#3b82d4;border-radius:2px;vertical-align:middle;"></span>
-          </td>
-        </tr>
-        
-        <tr>
-          <td><code>user-domain</code></td>
+          <td><code>product-module</code></td>
           <td style="font-size:11px;color:#57606a;">Subagent-2</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:03.850</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:06.440</td>
-          <td>2.59</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:19.208</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:23.628</td>
+          <td>4.42</td>
           <td>
             
             
-            <span style="display:inline-block;width:24px;height:10px;
+            <span style="display:inline-block;width:48px;height:10px;
               background:#1a7f37;border-radius:2px;vertical-align:middle;"></span>
           </td>
         </tr>
         
         <tr>
-          <td><code>user-api</code></td>
+          <td><code>user-module</code></td>
           <td style="font-size:11px;color:#57606a;">Subagent-2</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:04.050</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:09.907</td>
-          <td>5.86</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:19.608</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:24.642</td>
+          <td>5.03</td>
           <td>
             
             
@@ -500,57 +552,29 @@
         </tr>
         
         <tr>
-          <td><code>user-persistence</code></td>
-          <td style="font-size:11px;color:#57606a;">Subagent-2</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:04.451</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:08.655</td>
-          <td>4.20</td>
+          <td><code>product-module</code></td>
+          <td style="font-size:11px;color:#57606a;">Subagent-3</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:23.628</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:26.331</td>
+          <td>2.70</td>
+          <td>
+            
+            
+            <span style="display:inline-block;width:32px;height:10px;
+              background:#7c5cd8;border-radius:2px;vertical-align:middle;"></span>
+          </td>
+        </tr>
+        
+        <tr>
+          <td><code>user-module</code></td>
+          <td style="font-size:11px;color:#57606a;">Subagent-3</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:24.642</td>
+          <td style="font-family:monospace;font-size:11px;">11:56:27.844</td>
+          <td>3.20</td>
           <td>
             
             
             <span style="display:inline-block;width:40px;height:10px;
-              background:#1a7f37;border-radius:2px;vertical-align:middle;"></span>
-          </td>
-        </tr>
-        
-        <tr>
-          <td><code>user-domain</code></td>
-          <td style="font-size:11px;color:#57606a;">Subagent-3</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:06.440</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:08.261</td>
-          <td>1.82</td>
-          <td>
-            
-            
-            <span style="display:inline-block;width:16px;height:10px;
-              background:#7c5cd8;border-radius:2px;vertical-align:middle;"></span>
-          </td>
-        </tr>
-        
-        <tr>
-          <td><code>user-persistence</code></td>
-          <td style="font-size:11px;color:#57606a;">Subagent-3</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:08.655</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:10.957</td>
-          <td>2.30</td>
-          <td>
-            
-            
-            <span style="display:inline-block;width:24px;height:10px;
-              background:#7c5cd8;border-radius:2px;vertical-align:middle;"></span>
-          </td>
-        </tr>
-        
-        <tr>
-          <td><code>user-api</code></td>
-          <td style="font-size:11px;color:#57606a;">Subagent-3</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:09.907</td>
-          <td style="font-family:monospace;font-size:11px;">09:24:11.512</td>
-          <td>1.60</td>
-          <td>
-            
-            
-            <span style="display:inline-block;width:16px;height:10px;
               background:#7c5cd8;border-radius:2px;vertical-align:middle;"></span>
           </td>
         </tr>
@@ -559,11 +583,15 @@
     </table>
 
     <p style="font-size:11px;color:#57606a;margin-top:10px;">
-      <strong>Overlap proof:</strong> <code>user-domain/Subagent-2</code> started at
-      <code>09:24:03.850</code> while <code>user-persistence/Subagent-1</code> was still
-      running until <code>09:24:04.450</code> and <code>user-api/Subagent-1</code> was still
-      running until <code>09:24:04.050</code>.
-      All three Subagent-1 stages ran simultaneously from <code>09:24:02.582</code> to <code>09:24:03.850</code>.
+      <strong>Overlap proof:</strong> Genuine concurrent execution verified across independent domain modules:
+      
+        <code>product-module/Subagent-1</code> with <code>user-module/Subagent-1</code> (1.62s), 
+      
+        <code>user-module/Subagent-1</code> with <code>product-module/Subagent-2</code> (0.40s), 
+      
+        <code>product-module/Subagent-2</code> with <code>user-module/Subagent-2</code> (4.02s)
+      .
+      All 2 modules dispatched simultaneously at start.
     </p>
   </div>
   

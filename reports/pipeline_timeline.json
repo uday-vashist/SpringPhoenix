@@ -1,182 +1,108 @@
 {
-  "generated_at": "2026-09-27T09:24:11.515681+00:00",
+  "generated_at": "2026-09-27T11:56:27.847127+00:00",
   "modules": [
-    "user-domain",
-    "user-persistence",
-    "user-api"
+    "user-module",
+    "product-module"
   ],
   "stats": {
-    "wall_clock_s": 8.929,
-    "sequential_s": 22.972,
-    "parallelism_gain_s": 14.043,
-    "overlap_count": 13,
+    "wall_clock_s": 10.257,
+    "sequential_s": 19.0,
+    "parallelism_gain_s": 8.743,
+    "overlap_count": 5,
     "overlaps": [
       {
-        "stage_a": "user-domain/Subagent-1",
-        "stage_b": "user-api/Subagent-1",
-        "overlap_s": 1.262
+        "stage_a": "product-module/Subagent-1",
+        "stage_b": "user-module/Subagent-1",
+        "overlap_s": 1.62
       },
       {
-        "stage_a": "user-domain/Subagent-1",
-        "stage_b": "user-persistence/Subagent-1",
-        "overlap_s": 1.264
-      },
-      {
-        "stage_a": "user-api/Subagent-1",
-        "stage_b": "user-persistence/Subagent-1",
-        "overlap_s": 1.462
-      },
-      {
-        "stage_a": "user-api/Subagent-1",
-        "stage_b": "user-domain/Subagent-2",
-        "overlap_s": 0.2
-      },
-      {
-        "stage_a": "user-persistence/Subagent-1",
-        "stage_b": "user-domain/Subagent-2",
-        "overlap_s": 0.6
-      },
-      {
-        "stage_a": "user-persistence/Subagent-1",
-        "stage_b": "user-api/Subagent-2",
+        "stage_a": "user-module/Subagent-1",
+        "stage_b": "product-module/Subagent-2",
         "overlap_s": 0.4
       },
       {
-        "stage_a": "user-domain/Subagent-2",
-        "stage_b": "user-persistence/Subagent-2",
-        "overlap_s": 1.989
+        "stage_a": "product-module/Subagent-2",
+        "stage_b": "user-module/Subagent-2",
+        "overlap_s": 4.02
       },
       {
-        "stage_a": "user-domain/Subagent-2",
-        "stage_b": "user-api/Subagent-2",
-        "overlap_s": 2.39
+        "stage_a": "user-module/Subagent-2",
+        "stage_b": "product-module/Subagent-3",
+        "overlap_s": 1.013
       },
       {
-        "stage_a": "user-domain/Subagent-3",
-        "stage_b": "user-persistence/Subagent-2",
-        "overlap_s": 1.821
-      },
-      {
-        "stage_a": "user-domain/Subagent-3",
-        "stage_b": "user-api/Subagent-2",
-        "overlap_s": 1.821
-      },
-      {
-        "stage_a": "user-persistence/Subagent-2",
-        "stage_b": "user-api/Subagent-2",
-        "overlap_s": 4.204
-      },
-      {
-        "stage_a": "user-api/Subagent-2",
-        "stage_b": "user-persistence/Subagent-3",
-        "overlap_s": 1.251
-      },
-      {
-        "stage_a": "user-persistence/Subagent-3",
-        "stage_b": "user-api/Subagent-3",
-        "overlap_s": 1.05
+        "stage_a": "product-module/Subagent-3",
+        "stage_b": "user-module/Subagent-3",
+        "overlap_s": 1.69
       }
     ]
   },
   "records": [
     {
-      "module": "user-domain",
+      "module": "user-module",
       "stage": "Subagent-1",
-      "start_ts": 1790501042.5828834,
-      "end_ts": 1790501043.8501794,
-      "start_fmt": "09:24:02.582",
-      "end_fmt": "09:24:03.850",
-      "duration_s": 1.267,
+      "start_ts": 1790510177.5875154,
+      "end_ts": 1790510179.6084907,
+      "start_fmt": "11:56:17.587",
+      "end_fmt": "11:56:19.608",
+      "duration_s": 2.021,
       "status": "ok",
-      "detail": "line_cov=95.7%  logic_gaps=2"
+      "detail": "line_cov=100.0%  logic_gaps=4"
     },
     {
-      "module": "user-persistence",
+      "module": "product-module",
       "stage": "Subagent-1",
-      "start_ts": 1790501042.586453,
-      "end_ts": 1790501044.4509044,
-      "start_fmt": "09:24:02.586",
-      "end_fmt": "09:24:04.450",
-      "duration_s": 1.864,
+      "start_ts": 1790510177.5884151,
+      "end_ts": 1790510179.2085447,
+      "start_fmt": "11:56:17.588",
+      "end_fmt": "11:56:19.208",
+      "duration_s": 1.62,
       "status": "ok",
-      "detail": "line_cov=95.7%  logic_gaps=1"
+      "detail": "line_cov=100.0%  logic_gaps=2"
     },
     {
-      "module": "user-api",
-      "stage": "Subagent-1",
-      "start_ts": 1790501042.5883675,
-      "end_ts": 1790501044.0502732,
-      "start_fmt": "09:24:02.588",
-      "end_fmt": "09:24:04.050",
-      "duration_s": 1.462,
-      "status": "ok",
-      "detail": "line_cov=95.7%  logic_gaps=0"
-    },
-    {
-      "module": "user-domain",
+      "module": "product-module",
       "stage": "Subagent-2",
-      "start_ts": 1790501043.850448,
-      "end_ts": 1790501046.4400392,
-      "start_fmt": "09:24:03.850",
-      "end_fmt": "09:24:06.440",
-      "duration_s": 2.59,
+      "start_ts": 1790510179.2087038,
+      "end_ts": 1790510183.6285334,
+      "start_fmt": "11:56:19.208",
+      "end_fmt": "11:56:23.628",
+      "duration_s": 4.42,
       "status": "ok",
-      "detail": "tests=10  passed=10  failed=0  logic_gaps=2"
+      "detail": "tests=61  passed=61  failed=0  logic_gaps=2"
     },
     {
-      "module": "user-api",
+      "module": "user-module",
       "stage": "Subagent-2",
-      "start_ts": 1790501044.0505183,
-      "end_ts": 1790501049.9071524,
-      "start_fmt": "09:24:04.050",
-      "end_fmt": "09:24:09.907",
-      "duration_s": 5.857,
+      "start_ts": 1790510179.6087093,
+      "end_ts": 1790510184.6421063,
+      "start_fmt": "11:56:19.608",
+      "end_fmt": "11:56:24.642",
+      "duration_s": 5.033,
       "status": "ok",
-      "detail": "tests=22  passed=22  failed=0  logic_gaps=0"
+      "detail": "tests=72  passed=72  failed=0  logic_gaps=4"
     },
     {
-      "module": "user-persistence",
-      "stage": "Subagent-2",
-      "start_ts": 1790501044.4512403,
-      "end_ts": 1790501048.6555753,
-      "start_fmt": "09:24:04.451",
-      "end_fmt": "09:24:08.655",
-      "duration_s": 4.204,
-      "status": "ok",
-      "detail": "tests=36  passed=36  failed=0  logic_gaps=1"
-    },
-    {
-      "module": "user-domain",
+      "module": "product-module",
       "stage": "Subagent-3",
-      "start_ts": 1790501046.4402697,
-      "end_ts": 1790501048.261053,
-      "start_fmt": "09:24:06.440",
-      "end_fmt": "09:24:08.261",
-      "duration_s": 1.821,
+      "start_ts": 1790510183.6287405,
+      "end_ts": 1790510186.3319232,
+      "start_fmt": "11:56:23.628",
+      "end_fmt": "11:56:26.331",
+      "duration_s": 2.703,
       "status": "ok",
-      "detail": "mutants=12  killed=12  survived=0  score=100%"
+      "detail": "mutants=17  killed=17  survived=0  score=100%"
     },
     {
-      "module": "user-persistence",
+      "module": "user-module",
       "stage": "Subagent-3",
-      "start_ts": 1790501048.655743,
-      "end_ts": 1790501050.957792,
-      "start_fmt": "09:24:08.655",
-      "end_fmt": "09:24:10.957",
-      "duration_s": 2.302,
+      "start_ts": 1790510184.6422973,
+      "end_ts": 1790510187.844982,
+      "start_fmt": "11:56:24.642",
+      "end_fmt": "11:56:27.844",
+      "duration_s": 3.203,
       "status": "ok",
-      "detail": "mutants=8  killed=8  survived=0  score=100%"
-    },
-    {
-      "module": "user-api",
-      "stage": "Subagent-3",
-      "start_ts": 1790501049.907326,
-      "end_ts": 1790501051.5123649,
-      "start_fmt": "09:24:09.907",
-      "end_fmt": "09:24:11.512",
-      "duration_s": 1.605,
-      "status": "ok",
-      "detail": "mutants=6  killed=6  survived=0  score=100%"
+      "detail": "mutants=25  killed=25  survived=0  score=100%"
     }
   ]
 }

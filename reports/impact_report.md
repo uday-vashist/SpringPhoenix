@@ -1,7 +1,7 @@
 # SpringPhoenix — Before/After Impact Report
 
-**Module:** `com.example.legacy (UserController · UserService · UserRepository · User)`  
-**Generated:** 2026-09-27 09:27 UTC  
+**Module:** `com.example.legacy (user-module + product-module)`  
+**Generated:** 2026-09-27 11:58 UTC  
 **Pipeline:** SpringPhoenix Modernization Pipeline (IBM Bob 2.0 + JaCoCo + PITest)
 
 ---
@@ -10,12 +10,12 @@
 
 | Metric | Before Pipeline | After Baseline Generation | After Modernization |
 |--------|-----------------|--------------------------|---------------------|
-| **Line Coverage %** | 0.00% (0/46 lines) | 95.65% (44/46 lines) | 95.65% (44/46 lines) |
+| **Line Coverage %** | 0.00% (0/84 lines) | 97.62% (82/84 lines) | 97.62% (82/84 lines) |
 | **Branch Coverage %** | 0.0% (no tests) | 0.0% (not captured) | 100.00% |
-| **Mutation Score %** | N/A (no tests existed) | N/A (baseline only) | 100.0% (26/26 killed, 0 survived) |
-| **Build Pass Rate** | Compiled, 0 tests | Baseline tests pass | 68/68 (100%) (68 tests, 37.8s) |
+| **Mutation Score %** | N/A (no tests existed) | N/A (baseline only) | 100.0% (42/42 killed, 0 survived) |
+| **Build Pass Rate** | Compiled, 0 tests | Baseline tests pass | 133/133 (100%) (133 tests, 26.1s) |
 | **Self-Heal Cycles Used** | — | — | 0 cycles total |
-| **Business-Logic Gaps Flagged** | 0 | 0 | 3 gap(s) |
+| **Business-Logic Gaps Flagged** | 0 | 0 | 5 gap(s) |
 | **Pipeline Runtime** | — | — | 59s (~1.0 min) |
 | **Manual Refactor Estimate** | ~8h (manual estimate) | — | — |
 | **Estimated Time Saved** | — | — | ≈ 479 min saved (8h manual → 1.0 min automated) |
@@ -26,16 +26,22 @@
 
 | Test Class | Tests | Pass | Fail | Time (s) |
 |------------|-------|------|------|----------|
-| `UserControllerIntegrationTest` | 15 | 15 | 0 | 27.87 |
-| `UserControllerTest` | 7 | 7 | 0 | 0.83 |
-| `UserTest` | 8 | 8 | 0 | 0.10 |
-| `UserRepositoryIntegrationTest` | 13 | 13 | 0 | 4.85 |
-| `UserRepositoryTest` | 5 | 5 | 0 | 1.27 |
-| `UserServiceIntegrationTest` | 12 | 12 | 0 | 2.26 |
-| `UserServiceTest` | 6 | 6 | 0 | 0.57 |
-| `SpringPhoenixApplicationTests` | 2 | 2 | 0 | 0.09 |
+| `ProductControllerIntegrationTest` | 15 | 15 | 0 | 19.20 |
+| `ProductControllerTest` | 8 | 8 | 0 | 0.47 |
+| `UserControllerIntegrationTest` | 15 | 15 | 0 | 0.75 |
+| `UserControllerTest` | 7 | 7 | 0 | 0.13 |
+| `ProductTest` | 7 | 7 | 0 | 0.04 |
+| `UserTest` | 12 | 12 | 0 | 0.06 |
+| `ProductRepositoryIntegrationTest` | 11 | 11 | 0 | 1.39 |
+| `UserRepositoryIntegrationTest` | 13 | 13 | 0 | 0.59 |
+| `UserRepositoryTest` | 5 | 5 | 0 | 0.97 |
+| `ProductServiceIntegrationTest` | 13 | 13 | 0 | 1.80 |
+| `ProductServiceTest` | 7 | 7 | 0 | 0.21 |
+| `UserServiceIntegrationTest` | 12 | 12 | 0 | 0.31 |
+| `UserServiceTest` | 6 | 6 | 0 | 0.16 |
+| `SpringPhoenixApplicationTests` | 2 | 2 | 0 | 0.05 |
 
-**Total:** 68 tests · 68 passed · 0 failed · 37.8s
+**Total:** 133 tests · 133 passed · 0 failed · 26.1s
 
 ---
 
@@ -43,8 +49,8 @@
 
 | Stat | Value |
 |------|-------|
-| Total mutants generated | 26 |
-| Mutants killed | 26 |
+| Total mutants generated | 42 |
+| Mutants killed | 42 |
 | Mutants survived | 0 |
 | Test strength | 100.0% |
 | Strengthening cycles needed | 0 (all mutants killed first run) |
@@ -59,11 +65,13 @@ None required — all tests passed first-time
 
 ## Business-Logic Gaps Flagged
 
-3 method(s) flagged by the business-logic scanner (`.bob/SKILL.md`):
+5 method(s) flagged by the business-logic scanner (`.bob/SKILL.md`):
 
   - **`User.equals(Object o)`** (`src/main/java/com/example/legacy/model/User.java`) — Uses surrogate-key-only equality: two entities with the same field values but null IDs (transient, not yet persisted) ar…
   - **`User.hashCode()`** (`src/main/java/com/example/legacy/model/User.java`) — Returns `Objects.hashCode(id)`, which evaluates to `0` for all transient (unsaved) `User` instances. This is a documente…
   - **`UserService.deleteUser(Long id)`** (`src/main/java/com/example/legacy/service/UserService.java`) — Calls `deleteById` without first checking whether the entity exists. Spring Data's `deleteById` silently no-ops on a mis…
+  - **`ProductService.deleteProduct(...)`** (`src/main/java/com/example/legacy/Service/ProductService.java`) — Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing…
+  - **`UserService.deleteUser(...)`** (`src/main/java/com/example/legacy/Service/UserService.java`) — Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing…
 
 > Full details: [`reports/knowledge_gaps.md`](knowledge_gaps.md)
 
@@ -85,31 +93,28 @@ None required — all tests passed first-time
 
 ## Parallel Execution Timeline
 
-Three independent module pipelines ran concurrently (`user-domain`, `user-persistence`, `user-api`).
+2 independent module pipelines ran concurrently (`user-module`, `product-module`).
 
 | Metric | Value |
 |--------|-------|
-| Wall-clock time (concurrent) | **8.93s** |
-| Sequential equivalent | 22.97s |
-| Parallelism gain | **14.04s saved** |
-| Speed-up factor | **2.6x** |
-| Stage overlaps proven | 13 concurrent pairs |
+| Wall-clock time (concurrent) | **10.26s** |
+| Sequential equivalent | 19.00s |
+| Parallelism gain | **8.74s saved** |
+| Speed-up factor | **1.9x** |
+| Stage overlaps proven | 5 concurrent pairs |
 
 ### Stage Timeline
 
 | Module | Stage | Start (UTC) | End (UTC) | Duration (s) | Detail |
 |--------|-------|-------------|-----------|-------------|--------|
-| `user-domain` | Subagent-1 | 09:24:02.582 | 09:24:03.850 | 1.27 | line_cov=95.7%  logic_gaps=2 |
-| `user-persistence` | Subagent-1 | 09:24:02.586 | 09:24:04.450 | 1.86 | line_cov=95.7%  logic_gaps=1 |
-| `user-api` | Subagent-1 | 09:24:02.588 | 09:24:04.050 | 1.46 | line_cov=95.7%  logic_gaps=0 |
-| `user-domain` | Subagent-2 | 09:24:03.850 | 09:24:06.440 | 2.59 | tests=10  passed=10  failed=0  logic_gaps=2 |
-| `user-api` | Subagent-2 | 09:24:04.050 | 09:24:09.907 | 5.86 | tests=22  passed=22  failed=0  logic_gaps=0 |
-| `user-persistence` | Subagent-2 | 09:24:04.451 | 09:24:08.655 | 4.20 | tests=36  passed=36  failed=0  logic_gaps=1 |
-| `user-domain` | Subagent-3 | 09:24:06.440 | 09:24:08.261 | 1.82 | mutants=12  killed=12  survived=0  score=100% |
-| `user-persistence` | Subagent-3 | 09:24:08.655 | 09:24:10.957 | 2.30 | mutants=8  killed=8  survived=0  score=100% |
-| `user-api` | Subagent-3 | 09:24:09.907 | 09:24:11.512 | 1.60 | mutants=6  killed=6  survived=0  score=100% |
+| `user-module` | Subagent-1 | 11:56:17.587 | 11:56:19.608 | 2.02 | line_cov=100.0%  logic_gaps=4 |
+| `product-module` | Subagent-1 | 11:56:17.588 | 11:56:19.208 | 1.62 | line_cov=100.0%  logic_gaps=2 |
+| `product-module` | Subagent-2 | 11:56:19.208 | 11:56:23.628 | 4.42 | tests=61  passed=61  failed=0  logic_gaps=2 |
+| `user-module` | Subagent-2 | 11:56:19.608 | 11:56:24.642 | 5.03 | tests=72  passed=72  failed=0  logic_gaps=4 |
+| `product-module` | Subagent-3 | 11:56:23.628 | 11:56:26.331 | 2.70 | mutants=17  killed=17  survived=0  score=100% |
+| `user-module` | Subagent-3 | 11:56:24.642 | 11:56:27.844 | 3.20 | mutants=25  killed=25  survived=0  score=100% |
 
-> **Overlap proof:** `user-domain/Subagent-2` started at `09:24:03.850` while `user-persistence/Subagent-1` was still running until `09:24:04.450` and `user-api/Subagent-1` was still running until `09:24:04.050`. All three modules' Subagent-1 stages ran simultaneously from `09:24:02.582` to `09:24:03.850`.
+> **Overlap proof:** Genuine concurrent execution verified across independent domain modules: `product-module/Subagent-1` with `user-module/Subagent-1` (1.62s), `user-module/Subagent-1` with `product-module/Subagent-2` (0.40s), `product-module/Subagent-2` with `user-module/Subagent-2` (4.02s). All 2 modules dispatched concurrently and overlapped across stages.
 
 ---
 

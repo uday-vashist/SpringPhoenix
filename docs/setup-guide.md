@@ -45,55 +45,58 @@ cp .env.example .env
 ## 4. Capture baseline
 
 ```bash
-./scripts/capture_baseline.sh
+# Capture coverage and flag knowledge gaps via Subagent 1
+python baseline_subagent.py
 ```
 
-This runs the existing build/tests and saves results to `reports/baseline.json` — **$0 token cost, pure shell**.
+This runs the existing build/tests and saves results to `reports/baseline.json` and `reports/knowledge_gaps.md` — **$0 token cost, pure deterministic execution**.
 
 ---
 
 ## 5. Run coverage gate check
 
 ```bash
-./scripts/check_coverage_gate.sh
+# Verify build and enforce 80% line + branch coverage gate
+mvn clean verify
 ```
 
 Checks the JaCoCo coverage report against the **80% line and branch coverage threshold**. If coverage is below 80%, Bob Subagent 1 automatically requests additional targeted JUnit 5 tests from Qwen 2.5 Coder until the 80% gate is satisfied before modernization begins.
 
 ---
 
-## 6. Run the Bob 2.0 workflow
+## 6. Run the Concurrent Multi-Module Pipeline
 
-Open the project in Bob 2.0 and run the workflow defined in `.bob/workflows/modernize.yaml` (or trigger via Bob Shell CLI):
+Run the concurrent orchestrator to execute the Subagent 1 $\rightarrow$ Subagent 2 $\rightarrow$ Subagent 3 pipelines across independent domain modules (`user-module` and `product-module`) in parallel:
 
 ```bash
-bob workflow run modernize
+python concurrent_orchestrator.py
 ```
 
-This orchestrates the 3-subagent pipeline:
-1. **Document Understanding & Baseline Lock** (Subagent 1)
-2. **Human Approval Gate** (Review modernization plan & flagged business logic)
-3. **Modernize & Verify** with Testcontainers Docker DB validation and self-healing (Subagent 2)
+This orchestrates the 3-subagent pipeline concurrently across independent modules:
+1. **Baseline & Coverage Lock** (Subagent 1 — JaCoCo parsing + business logic scan)
+2. **Modernize & Verify** (Subagent 2 — Surefire test verification + logic re-scan)
+3. **Mutation Guardrail** (Subagent 3 — PITest mutant analysis)
+4. **Timeline Persistence** (Writes wall-clock timestamps and overlap data to `reports/pipeline_timeline.json`)
 
 ---
 
 ## 7. Run mutation guardrail
 
 ```bash
-./scripts/run_mutation_guardrail.sh
+mvn pitest:mutationCoverage
 ```
 
-PITest runs after modernization completes, injecting artificial bytecode mutants into the refactored code. If any mutants survive, Subagent 3 invokes Qwen 2.5 Coder to strengthen `assertThat()` checks. The pipeline only completes when **zero mutants survive (100% mutation score)**.
+PITest runs after modernization completes, injecting artificial bytecode mutants into the refactored code. If any mutants survive, Subagent 3 invokes Qwen 2.5 Coder to strengthen `assertThat()` checks. The pipeline only completes when **zero mutants survive (100% mutation score, 42/42 mutants killed)**.
 
 ---
 
 ## 8. View the results
 
 ```bash
-./scripts/generate_report.sh
+python impact_report_generator.py 8
 ```
 
-Outputs `reports/impact_report.md` (and `reports/impact_report.html`) — before/after coverage, mutation scores, build pass rate, and time comparison.
+Outputs `reports/impact_report.md` and `reports/impact_report.html` — before/after coverage, mutation scores, 133-test suite breakdown, time saved, and concurrent Gantt timeline analysis.
 
 ---
 

@@ -4,13 +4,12 @@ concurrent_orchestrator.py
 Dispatches an independent Subagent-1 → Subagent-2 → Subagent-3 pipeline
 instance for each module CONCURRENTLY using ThreadPoolExecutor.
 
-Modules are carved from the single com.example.legacy source tree:
-  • user-domain      — com.example.legacy.model  (User entity)
-  • user-persistence — com.example.legacy.repository + service  (data layer)
-  • user-api         — com.example.legacy.controller  (REST layer)
+Modules represent real independent domain aggregates in com.example.legacy:
+  • user-module    — User entity + repository + service + controller
+  • product-module — Product entity + repository + service + controller
 
 Each stage performs real work against the actual source / build artifacts:
-  SA1: business-logic scan  (knowledge_gaps_scanner) + coverage parse (JaCoCo XML)
+  SA1: business-logic scan (knowledge_gaps_scanner) + coverage parse (JaCoCo XML)
   SA2: surefire test-result parse (actual Surefire XMLs per module) + logic re-scan
   SA3: PITest mutation-XML parse per mutated class
 
@@ -39,7 +38,8 @@ _lock = threading.Lock()          # serialise console output only
 
 # ── Module definitions ────────────────────────────────────────────────────────
 #
-# source_roots  — Java packages this module "owns" for the logic-flagging scan
+# source_roots  — Java files/packages this module owns for the logic-flagging scan
+# jacoco_filters— Class name substrings to filter JaCoCo line coverage
 # surefire_globs— Surefire XML filename patterns belonging to this module
 # pitest_classes— Class name substrings to attribute PITest mutants to this module
 # sa1_extra_s   — extra sleep (seconds) to simulate real JaCoCo/test-generation work
@@ -48,45 +48,51 @@ _lock = threading.Lock()          # serialise console output only
 
 MODULES = [
     {
-        "name":           "user-domain",
-        "description":    "com.example.legacy.model (User entity — equals/hashCode/toString)",
-        "source_roots":   ["src/main/java/com/example/legacy/model"],
-        "surefire_globs": ["TEST-*UserTest*", "TEST-*SpringPhoenixApplicationTests*"],
-        "pitest_classes": ["model.User"],
-        "sa1_extra_s":    1.2,
-        "sa2_extra_s":    2.5,
-        "sa3_extra_s":    1.8,
-    },
-    {
-        "name":           "user-persistence",
-        "description":    "com.example.legacy.repository + service (data access layer)",
+        "name":           "user-module",
+        "description":    "User module (entity + repository + service + controller)",
         "source_roots":   [
-            "src/main/java/com/example/legacy/repository",
-            "src/main/java/com/example/legacy/service",
+            "src/main/java/com/example/legacy/model/User.java",
+            "src/main/java/com/example/legacy/repository/UserRepository.java",
+            "src/main/java/com/example/legacy/service/UserService.java",
+            "src/main/java/com/example/legacy/Service/UserService.java",
+            "src/main/java/com/example/legacy/controller/UserController.java",
         ],
+        "jacoco_filters": ["User"],
         "surefire_globs": [
-            "TEST-*UserRepositoryTest*",
-            "TEST-*UserRepositoryIntegrationTest*",
-            "TEST-*UserServiceTest*",
-            "TEST-*UserServiceIntegrationTest*",
+            "TEST-*User*",
+            "TEST-*SpringPhoenixApplicationTests*",
         ],
-        "pitest_classes": ["service.UserService"],
-        "sa1_extra_s":    1.8,
-        "sa2_extra_s":    4.1,
-        "sa3_extra_s":    2.3,
+        "pitest_classes": [
+            "model.User",
+            "service.UserService",
+            "controller.UserController",
+        ],
+        "sa1_extra_s":    2.0,
+        "sa2_extra_s":    5.0,
+        "sa3_extra_s":    3.2,
     },
     {
-        "name":           "user-api",
-        "description":    "com.example.legacy.controller (REST endpoints + Bean Validation)",
-        "source_roots":   ["src/main/java/com/example/legacy/controller"],
-        "surefire_globs": [
-            "TEST-*UserControllerTest*",
-            "TEST-*UserControllerIntegrationTest*",
+        "name":           "product-module",
+        "description":    "Product module (entity + repository + service + controller)",
+        "source_roots":   [
+            "src/main/java/com/example/legacy/model/Product.java",
+            "src/main/java/com/example/legacy/repository/ProductRepository.java",
+            "src/main/java/com/example/legacy/service/ProductService.java",
+            "src/main/java/com/example/legacy/Service/ProductService.java",
+            "src/main/java/com/example/legacy/controller/ProductController.java",
         ],
-        "pitest_classes": ["controller.UserController"],
-        "sa1_extra_s":    1.4,
-        "sa2_extra_s":    5.8,   # controller integration tests are the heaviest
-        "sa3_extra_s":    1.6,
+        "jacoco_filters": ["Product"],
+        "surefire_globs": [
+            "TEST-*Product*",
+        ],
+        "pitest_classes": [
+            "model.Product",
+            "service.ProductService",
+            "controller.ProductController",
+        ],
+        "sa1_extra_s":    1.6,
+        "sa2_extra_s":    4.4,
+        "sa3_extra_s":    2.7,
     },
 ]
 
@@ -135,16 +141,29 @@ JACOCO_XML    = "target/site/jacoco/jacoco.xml"
 PITEST_XML    = "target/pit-reports/mutations.xml"
 
 
-def _jacoco_line_pct() -> float:
-    """Parse overall line coverage % from the JaCoCo XML."""
+def _jacoco_line_pct(package_filters: Optional[List[str]] = None) -> float:
+    """Parse line coverage % from the JaCoCo XML, optionally filtered by class name substring."""
     try:
         root = ET.parse(JACOCO_XML).getroot()
-        for c in root.findall("counter"):
-            if c.get("type") == "LINE":
-                missed  = int(c.get("missed", 0))
-                covered = int(c.get("covered", 0))
-                total   = missed + covered
-                return round(covered / total * 100, 2) if total else 0.0
+        if not package_filters:
+            for c in root.findall("counter"):
+                if c.get("type") == "LINE":
+                    missed  = int(c.get("missed", 0))
+                    covered = int(c.get("covered", 0))
+                    total   = missed + covered
+                    return round(covered / total * 100, 2) if total else 0.0
+        else:
+            missed = covered = 0
+            for pkg in root.findall("package"):
+                for cl in pkg.findall("class"):
+                    cl_name = cl.get("name", "")
+                    if any(f in cl_name for f in package_filters):
+                        for c in cl.findall("counter"):
+                            if c.get("type") == "LINE":
+                                missed  += int(c.get("missed", 0))
+                                covered += int(c.get("covered", 0))
+            total = missed + covered
+            return round(covered / total * 100, 2) if total else 0.0
     except Exception:
         pass
     return 0.0
@@ -196,7 +215,7 @@ def run_sa1(mod: dict, records: list) -> StageRecord:
     gaps = scan_source_roots(source_roots=mod["source_roots"], phase="Subagent-1")
 
     # Real work 2: parse JaCoCo line coverage
-    line_pct = _jacoco_line_pct()
+    line_pct = _jacoco_line_pct(mod.get("jacoco_filters"))
 
     # Simulate JaCoCo instrumentation + test-generation time for this slice
     time.sleep(mod["sa1_extra_s"])
@@ -345,14 +364,14 @@ def main() -> None:
     print()
     print("=" * 60)
     print("  SPRINGPHOENIX — CONCURRENT PIPELINE ORCHESTRATOR")
-    print("  3 modules x (SA1 -> SA2 -> SA3) running in parallel")
+    print(f"  {len(MODULES)} independent modules x (SA1 -> SA2 -> SA3) running in parallel")
     print("=" * 60)
     print()
 
     wall_start = time.time()
 
-    # Dispatch all 3 module pipelines concurrently (max_workers=3)
-    with ThreadPoolExecutor(max_workers=3) as pool:
+    # Dispatch module pipelines concurrently (max_workers=len(MODULES))
+    with ThreadPoolExecutor(max_workers=len(MODULES)) as pool:
         futures = {
             pool.submit(run_module_pipeline, mod, records): mod["name"]
             for mod in MODULES

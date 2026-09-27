@@ -211,10 +211,11 @@ class JavaMethodScanner:
             )
 
         # ── Rule 3: delete operations with no guard or return value ──────────
-        if (method_name in ("deleteUser", "deleteById")
+        if ((method_name in ("deleteUser", "deleteProduct", "deleteById") or method_name.startswith("delete"))
                 and _SILENT_DELETE_RE.search(body_text)
                 and "findById" not in body_text
                 and "existsById" not in body_text):
+            entity = class_name.replace("Service", "").replace("Controller", "").lower() or "resource"
             return KnowledgeGap(
                 file_path=rel_path,
                 class_name=class_name,
@@ -224,11 +225,11 @@ class JavaMethodScanner:
                     "exists. Spring Data's deleteById silently no-ops on a missing ID "
                     "in Spring Data 3.x but throws EmptyResultDataAccessException in "
                     "earlier versions. The controller returns 204 No Content whether "
-                    "the user existed or not — the caller cannot distinguish a "
+                    f"the {entity} existed or not — the caller cannot distinguish a "
                     "successful delete from a delete of a non-existent resource."
                 ),
                 suggested_question=(
-                    "Should DELETE /api/users/{id} return 404 Not Found when the "
+                    f"Should DELETE /api/{entity}s/{{id}} return 404 Not Found when the "
                     "given ID does not exist, or is 204 No Content on a missing "
                     "resource intentional (idempotent delete semantics)? "
                     "If idempotent behaviour is required, please confirm this "
@@ -267,7 +268,7 @@ class JavaMethodScanner:
 
     @staticmethod
     def _extract_class_name(source: str) -> str:
-        m = re.search(r"(?:public\s+)?(?:class|interface|enum|record)\s+(\w+)", source)
+        m = re.search(r"^\s*(?:(?:public|abstract|final|sealed|non-sealed)\s+)*(?:class|interface|enum|record)\s+(\w+)", source, re.MULTILINE)
         return m.group(1) if m else "Unknown"
 
     @staticmethod
@@ -308,21 +309,23 @@ def scan_source_roots(
     phase: str = "Subagent-1",
 ) -> List[KnowledgeGap]:
     """
-    Walk all .java files under each source root and return every flagged gap.
+    Walk all .java files under each source root (or file path) and return every flagged gap.
     Roots that don't exist are silently skipped.
     """
     scanner = JavaMethodScanner()
     all_gaps: List[KnowledgeGap] = []
 
     for root in source_roots:
-        if not os.path.isdir(root):
-            continue
-        for dirpath, _, filenames in os.walk(root):
-            for fname in filenames:
-                if fname.endswith(".java"):
-                    full_path = os.path.join(dirpath, fname)
-                    gaps = scanner.scan_file(full_path, phase)
-                    all_gaps.extend(gaps)
+        if os.path.isfile(root) and root.endswith(".java"):
+            gaps = scanner.scan_file(root, phase)
+            all_gaps.extend(gaps)
+        elif os.path.isdir(root):
+            for dirpath, _, filenames in os.walk(root):
+                for fname in filenames:
+                    if fname.endswith(".java"):
+                        full_path = os.path.join(dirpath, fname)
+                        gaps = scanner.scan_file(full_path, phase)
+                        all_gaps.extend(gaps)
 
     return all_gaps
 

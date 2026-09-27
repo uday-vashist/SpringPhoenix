@@ -65,3 +65,70 @@ Calls `deleteById` without first checking whether the entity exists. Spring Data
 > Should `DELETE /api/users/{id}` return `404 Not Found` when the given ID does not exist, or is `204 No Content` on a missing resource intentional (idempotent delete semantics)? If idempotent behaviour is required, please confirm this explicitly so it can be documented and tested as a contract.
 
 ---
+
+## Run: 2026-09-27 11:56 UTC (Subagent-1) — 4 gap(s) flagged
+
+### Gap 1: `User.equals(Object o)`
+
+| Field | Value |
+|---|---|
+| **File** | `src/main/java\com\example\legacy\model\User.java` |
+| **Method** | `equals(Object o)` |
+| **Line** | 70 |
+| **Phase detected** | Subagent-1 |
+
+**Why it's unclear:**
+Uses surrogate-key-only equality: two entities with the same field values but null IDs (transient, not yet persisted) are intentionally unequal. The technical mechanism (id != null guard) is commented, but the *business rule* — whether two User objects representing the same real person before save should be treated as distinct — is not documented. This affects Set/Map deduplication behaviour at the application layer.
+
+**Suggested question for human reviewer:**
+> Should two User objects with identical username/email but no database ID (e.g. built from an API request before being saved) be considered equal? Or is uniqueness intentionally deferred until the database assigns an ID? If the latter, is there any code path where transient User objects are collected in a Set before save, and would duplicate entries be silently allowed there?
+
+---
+### Gap 2: `User.hashCode()`
+
+| Field | Value |
+|---|---|
+| **File** | `src/main/java\com\example\legacy\model\User.java` |
+| **Method** | `hashCode()` |
+| **Line** | 77 |
+| **Phase detected** | Subagent-1 |
+
+**Why it's unclear:**
+Returns Objects.hashCode(id), which evaluates to 0 for all transient (unsaved) User instances. This is a documented JPA best-practice to avoid rehashing after ID assignment, but the comment explains *how* not *why*. If transient users are stored in a HashMap or HashSet before being persisted, all of them collide into bucket 0, creating O(n) lookup degradation. Whether this is an acceptable trade-off for this domain is not stated.
+
+**Suggested question for human reviewer:**
+> Is it acceptable for all transient (not-yet-saved) User objects to hash to 0? Are there any application flows that add User objects to a HashSet or use them as HashMap keys before the entity is persisted? If yes, has the O(n) hash collision performance impact been assessed and accepted for the expected collection sizes?
+
+---
+### Gap 3: `ProductService.deleteProduct(...)`
+
+| Field | Value |
+|---|---|
+| **File** | `src/main/java\com\example\legacy\Service\ProductService.java` |
+| **Method** | `deleteProduct(...)` |
+| **Line** | 50 |
+| **Phase detected** | Subagent-1 |
+
+**Why it's unclear:**
+Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing ID in Spring Data 3.x but throws EmptyResultDataAccessException in earlier versions. The controller returns 204 No Content whether the product existed or not — the caller cannot distinguish a successful delete from a delete of a non-existent resource.
+
+**Suggested question for human reviewer:**
+> Should DELETE /api/products/{id} return 404 Not Found when the given ID does not exist, or is 204 No Content on a missing resource intentional (idempotent delete semantics)? If idempotent behaviour is required, please confirm this explicitly so it can be documented and tested as a contract.
+
+---
+### Gap 4: `UserService.deleteUser(...)`
+
+| Field | Value |
+|---|---|
+| **File** | `src/main/java\com\example\legacy\Service\UserService.java` |
+| **Method** | `deleteUser(...)` |
+| **Line** | 63 |
+| **Phase detected** | Subagent-1 |
+
+**Why it's unclear:**
+Calls deleteById without first checking whether the entity exists. Spring Data's deleteById silently no-ops on a missing ID in Spring Data 3.x but throws EmptyResultDataAccessException in earlier versions. The controller returns 204 No Content whether the user existed or not — the caller cannot distinguish a successful delete from a delete of a non-existent resource.
+
+**Suggested question for human reviewer:**
+> Should DELETE /api/users/{id} return 404 Not Found when the given ID does not exist, or is 204 No Content on a missing resource intentional (idempotent delete semantics)? If idempotent behaviour is required, please confirm this explicitly so it can be documented and tested as a contract.
+
+---
