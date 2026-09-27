@@ -1,0 +1,261 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>SpringPhoenix — Impact Report</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#f7f8fa;color:#1f2328;padding:24px 16px 48px}
+  .page{max-width:840px;margin:0 auto}
+  .report-header{background:#1f2328;color:#fff;border-radius:8px;padding:26px 30px 22px;margin-bottom:22px}
+  .report-header h1{font-size:21px;font-weight:700;margin-bottom:5px}
+  .report-header .meta{font-size:12px;color:#8b949e;line-height:1.8}
+  .badge{display:inline-block;background:#3b82d4;color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:12px;margin-top:7px}
+  .srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:22px}
+  .sc{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:14px 16px;text-align:center}
+  .sc .lbl{font-size:10px;color:#57606a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .sc .val{font-size:26px;font-weight:700;color:#1f2328}
+  .sc .sub{font-size:10px;color:#57606a;margin-top:3px}
+  .sc.g .val{color:#1a7f37} .sc.b .val{color:#3b82d4} .sc.p .val{color:#7c5cd8} .sc.a .val{color:#b45309}
+  .sec{margin-bottom:22px}
+  .sec h2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#57606a;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid #e5e7eb}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;font-size:12px;border-bottom:1px solid #f0f0f0}
+  th{background:#f7f8fa;font-weight:600;color:#57606a;font-size:11px;text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+  td.m{font-weight:600;color:#1f2328;width:32%} td.bef{color:#57606a} td.aft{color:#1a7f37;font-weight:600}
+  td.aft.w{color:#b45309} td.pass{color:#1a7f37;font-weight:600} td.bl{color:#3b82d4}
+  tfoot td{background:#f7f8fa;font-weight:700;border-top:2px solid #e5e7eb}
+  code{background:#f0f0f0;padding:1px 4px;border-radius:3px;font-size:11px;font-family:"SFMono-Regular",Consolas,monospace}
+  .gap-card{background:#fff;border:1px solid #e5e7eb;border-left:4px solid #b45309;border-radius:6px;padding:11px 14px;margin-bottom:9px}
+  .gap-card .gt{font-weight:700;font-size:13px;margin-bottom:3px} .gap-card .gf{font-size:11px;color:#57606a;margin-bottom:5px} .gap-card .gr{font-size:12px}
+  .trow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+  .tc{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:13px 15px;text-align:center}
+  .tc .lbl{font-size:10px;color:#57606a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px} .tc .val{font-size:19px;font-weight:700;color:#1f2328}
+  .tc.hl{border-color:#3b82d4} .tc.hl .val{color:#3b82d4}
+  .pill{display:inline-block;background:#1a7f3720;color:#1a7f37;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600}
+  footer{text-align:center;font-size:11px;color:#8b949e;margin-top:30px;padding-top:14px;border-top:1px solid #e5e7eb}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="report-header">
+  <h1>SpringPhoenix — Before/After Impact Report</h1>
+  <div class="meta">
+    Module: com.example.legacy (UserController · UserService · UserRepository · User)<br />
+    Generated: 2026-09-27  ·  Pipeline: SpringPhoenix (IBM Bob 2.0 + JaCoCo + PITest)
+  </div>
+  <span class="badge">68 tests · 0 failures · 26/26 mutants killed · 3 modules parallel</span>
+</div>
+
+
+<div class="srow">
+  <div class="sc g"><div class="lbl">Line Coverage</div><div class="val">95.7%</div><div class="sub">44/46 lines</div></div>
+  <div class="sc g"><div class="lbl">Branch Coverage</div><div class="val">100%</div><div class="sub">Gate: ≥80%</div></div>
+  <div class="sc b"><div class="lbl">Mutation Score</div><div class="val">100%</div><div class="sub">26/26 killed</div></div>
+  <div class="sc g"><div class="lbl">Tests Passing</div><div class="val">68</div><div class="sub">0 failures</div></div>
+  <div class="sc p"><div class="lbl">Self-Heal Cycles</div><div class="val">0</div><div class="sub">not triggered</div></div>
+  <div class="sc a"><div class="lbl">Logic Gaps</div><div class="val">3</div><div class="sub">pending review</div></div>
+</div>
+
+
+<div class="sec">
+  <h2>Before vs. After</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Before Pipeline</th><th>After Baseline (SA1)</th><th>After Modernization (SA2+SA3)</th></tr></thead>
+    <tbody>
+      <tr><td class="m">Line Coverage %</td><td class="bef">0.00% — 0/46 lines</td><td class="bl">95.65% — 44/46 lines</td><td class="aft">95.65% — 44/46 lines</td></tr>
+      <tr><td class="m">Branch Coverage %</td><td class="bef">0.0% (no tests)</td><td class="bl">Not captured</td><td class="aft">100.00%</td></tr>
+      <tr><td class="m">Mutation Score %</td><td class="bef">N/A — no tests</td><td class="bl">N/A (baseline only)</td><td class="aft">100.0% — 26 killed, 0 survived</td></tr>
+      <tr><td class="m">Build Pass Rate</td><td class="bef">Compiled, 0 tests</td><td class="bl">Baseline tests pass</td><td class="aft">68/68 (100%) in 37.8s</td></tr>
+      <tr><td class="m">Self-Heal Cycles</td><td class="bef">—</td><td class="bl">—</td><td class="aft">0/3 — not triggered</td></tr>
+      <tr><td class="m">Business-Logic Gaps</td><td class="bef">0 (not scanned)</td><td class="bl">0 (not scanned)</td><td class="aft w">3 flagged — pending review</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div class="sec">
+  <h2>Test Suite Breakdown</h2>
+  <table>
+    <thead><tr><th>Test Class</th><th>Type</th><th>Tests</th><th>Pass</th><th>Fail</th><th>Time (s)</th></tr></thead>
+    <tbody>
+      <tr><td><code>UserControllerIntegrationTest</code></td><td>Integration</td><td>15</td><td class="pass">15</td><td>0</td><td>27.87</td></tr>
+      <tr><td><code>UserControllerTest</code></td><td>Unit</td><td>7</td><td class="pass">7</td><td>0</td><td>0.83</td></tr>
+      <tr><td><code>UserTest</code></td><td>Unit</td><td>8</td><td class="pass">8</td><td>0</td><td>0.10</td></tr>
+      <tr><td><code>UserRepositoryIntegrationTest</code></td><td>Integration</td><td>13</td><td class="pass">13</td><td>0</td><td>4.85</td></tr>
+      <tr><td><code>UserRepositoryTest</code></td><td>Unit</td><td>5</td><td class="pass">5</td><td>0</td><td>1.27</td></tr>
+      <tr><td><code>UserServiceIntegrationTest</code></td><td>Integration</td><td>12</td><td class="pass">12</td><td>0</td><td>2.26</td></tr>
+      <tr><td><code>UserServiceTest</code></td><td>Unit</td><td>6</td><td class="pass">6</td><td>0</td><td>0.57</td></tr>
+      <tr><td><code>SpringPhoenixApplicationTests</code></td><td>Smoke</td><td>2</td><td class="pass">2</td><td>0</td><td>0.09</td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="2"><strong>Total</strong></td><td>68</td><td class="pass">68</td><td>0</td><td>37.8s</td></tr></tfoot>
+  </table>
+</div>
+
+
+<div class="sec">
+  <h2>Mutation Testing (PITest)</h2>
+  <table>
+    <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td class="m">Total mutants generated</td><td>26</td></tr>
+      <tr><td class="m">Mutants killed</td><td style="color:#1a7f37;font-weight:600">26</td></tr>
+      <tr><td class="m">Mutants survived</td><td style="color:#1a7f37;font-weight:600">0</td></tr>
+      <tr><td class="m">Test strength</td><td style="color:#1a7f37;font-weight:600">100%</td></tr>
+      <tr><td class="m">Strengthening cycles</td><td>0 — all killed on first run</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div class="sec">
+  <h2>Business-Logic Gaps Flagged (3)</h2>
+  <div class="gap-card">
+    <div class="gt">1. User.equals(Object o)</div>
+    <div class="gf"><code>model/User.java</code> · line 70 · Subagent-1</div>
+    <div class="gr">Surrogate-key equality: transient entities are intentionally unequal. Technical mechanism documented; business rule (whether two pre-save Users represent the same person) is not.</div>
+  </div>
+  <div class="gap-card">
+    <div class="gt">2. User.hashCode()</div>
+    <div class="gf"><code>model/User.java</code> · line 77 · Subagent-1</div>
+    <div class="gr">Returns <code>Objects.hashCode(id)</code> = 0 for all transient instances. O(n) HashSet collision risk for pre-persist collections not assessed.</div>
+  </div>
+  <div class="gap-card">
+    <div class="gt">3. UserService.deleteUser(Long id)</div>
+    <div class="gf"><code>service/UserService.java</code> · line 63 · Subagent-1</div>
+    <div class="gr">Calls <code>deleteById</code> without existence check. Always returns 204 — idempotent-delete vs. 404 contract not stated.</div>
+  </div>
+</div>
+
+
+<div class="sec">
+  <h2>Estimated Time Saved</h2>
+  <div class="trow">
+    <div class="tc"><div class="lbl">Pipeline Runtime</div><div class="val">59s</div></div>
+    <div class="tc"><div class="lbl">Manual Estimate</div><div class="val">~8h</div></div>
+    <div class="tc hl"><div class="lbl">Net Time Saved</div><div class="val">≈479 min</div></div>
+  </div>
+</div>
+
+
+<div class="sec">
+  <h2>Parallel Execution Timeline</h2>
+  <p style="font-size:12px;color:#57606a;margin-bottom:12px">
+    Three independent module pipelines dispatched concurrently via <code>ThreadPoolExecutor(max_workers=3)</code>
+    — each running its own SA1→SA2→SA3 sequence.
+  </p>
+
+  
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px">
+    <div class="sc b" style="padding:12px 14px"><div class="lbl">Wall-clock</div><div class="val" style="font-size:22px">8.93s</div><div class="sub">concurrent total</div></div>
+    <div class="sc" style="padding:12px 14px"><div class="lbl">Sequential equiv.</div><div class="val" style="font-size:22px">22.97s</div><div class="sub">if run serially</div></div>
+    <div class="sc g" style="padding:12px 14px"><div class="lbl">Time saved</div><div class="val" style="font-size:22px">14.04s</div><div class="sub">by parallelism</div></div>
+    <div class="sc g" style="padding:12px 14px"><div class="lbl">Speed-up</div><div class="val" style="font-size:22px">2.6x</div><div class="sub">faster than serial</div></div>
+    <div class="sc p" style="padding:12px 14px"><div class="lbl">Overlaps proven</div><div class="val" style="font-size:22px">13</div><div class="sub">concurrent pairs</div></div>
+  </div>
+
+  
+  <table>
+    <thead>
+      <tr><th>Module</th><th>Stage</th><th>Start (UTC)</th><th>End (UTC)</th><th>Dur (s)</th><th>Gantt</th></tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><code>user-domain</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-1</td>
+        <td style="font-family:monospace;font-size:11px">09:24:02.582</td>
+        <td style="font-family:monospace;font-size:11px">09:24:03.850</td>
+        <td>1.27</td>
+        <td><span style="display:inline-block;width:22px;height:10px;background:#3b82d4;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-persistence</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-1</td>
+        <td style="font-family:monospace;font-size:11px">09:24:02.586</td>
+        <td style="font-family:monospace;font-size:11px">09:24:04.450</td>
+        <td>1.86</td>
+        <td><span style="display:inline-block;width:32px;height:10px;background:#3b82d4;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-api</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-1</td>
+        <td style="font-family:monospace;font-size:11px">09:24:02.588</td>
+        <td style="font-family:monospace;font-size:11px">09:24:04.050</td>
+        <td>1.46</td>
+        <td><span style="display:inline-block;width:25px;height:10px;background:#3b82d4;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      
+      <tr>
+        <td><code>user-domain</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-2</td>
+        <td style="font-family:monospace;font-size:11px">09:24:03.850</td>
+        <td style="font-family:monospace;font-size:11px">09:24:06.440</td>
+        <td>2.59</td>
+        <td><span style="display:inline-block;width:45px;height:10px;background:#1a7f37;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-api</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-2</td>
+        <td style="font-family:monospace;font-size:11px">09:24:04.050</td>
+        <td style="font-family:monospace;font-size:11px">09:24:09.907</td>
+        <td>5.86</td>
+        <td><span style="display:inline-block;width:102px;height:10px;background:#1a7f37;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-persistence</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-2</td>
+        <td style="font-family:monospace;font-size:11px">09:24:04.451</td>
+        <td style="font-family:monospace;font-size:11px">09:24:08.655</td>
+        <td>4.20</td>
+        <td><span style="display:inline-block;width:73px;height:10px;background:#1a7f37;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      
+      <tr>
+        <td><code>user-domain</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-3</td>
+        <td style="font-family:monospace;font-size:11px">09:24:06.440</td>
+        <td style="font-family:monospace;font-size:11px">09:24:08.261</td>
+        <td>1.82</td>
+        <td><span style="display:inline-block;width:32px;height:10px;background:#7c5cd8;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-persistence</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-3</td>
+        <td style="font-family:monospace;font-size:11px">09:24:08.655</td>
+        <td style="font-family:monospace;font-size:11px">09:24:10.957</td>
+        <td>2.30</td>
+        <td><span style="display:inline-block;width:40px;height:10px;background:#7c5cd8;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+      <tr>
+        <td><code>user-api</code></td>
+        <td style="font-size:11px;color:#57606a">Subagent-3</td>
+        <td style="font-family:monospace;font-size:11px">09:24:09.907</td>
+        <td style="font-family:monospace;font-size:11px">09:24:11.512</td>
+        <td>1.60</td>
+        <td><span style="display:inline-block;width:28px;height:10px;background:#7c5cd8;border-radius:2px;vertical-align:middle"></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:10px;padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px">
+    <strong>Overlap proof — 3 examples from 13 total concurrent pairs:</strong><br />
+    1. <code>user-domain/SA1</code> (ends 03.850) ∩ <code>user-persistence/SA1</code> (ends 04.450) ∩ <code>user-api/SA1</code> (ends 04.050) → all three SA1s ran simultaneously (1.26s overlap)<br />
+    2. <code>user-domain/SA2</code> (starts 03.850, ends 06.440) overlapped <code>user-persistence/SA1</code> still running until 04.450 → <strong>SA2 of one module ran while SA1 of another was live</strong><br />
+    3. <code>user-persistence/SA2</code> ∩ <code>user-api/SA2</code> ran simultaneously for <strong>4.20s</strong>
+  </div>
+
+  <p style="font-size:11px;color:#57606a;margin-top:8px">
+    Legend: <span style="display:inline-block;width:18px;height:8px;background:#3b82d4;border-radius:2px;vertical-align:middle"></span> Subagent-1  
+    <span style="display:inline-block;width:18px;height:8px;background:#1a7f37;border-radius:2px;vertical-align:middle"></span> Subagent-2  
+    <span style="display:inline-block;width:18px;height:8px;background:#7c5cd8;border-radius:2px;vertical-align:middle"></span> Subagent-3
+  </p>
+</div>
+
+<footer>Made with IBM Bob  ·  SpringPhoenix Modernization Pipeline</footer>
+</div>
+</body>
+</html>
